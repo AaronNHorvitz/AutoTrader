@@ -1,6 +1,6 @@
-# Alpaca Ticker Downloader
+# STAT 656 Autotrader
 
-Welcome to the STAT 656 Autotrader. This project helps you fetch a list of all stock and ETF tickers (~11,000+) currently tracked by Alpaca and store them in a SQLite database and then execute the autotrader. 
+Welcome to the STAT 656 Autotrader! This project helps you fetch a list of all stock and ETF tickers (~11,000+) currently tracked by Alpaca, store them in a SQLite database, and then execute an autotrader. 
 
 ## Prerequisites
 
@@ -40,5 +40,5 @@ For more details, see Alpaca’s guide: [Connect to Alpaca API](https://alpaca.m
 ## Step 2: Install Dependencies
 Fire up your terminal (~or IDE) and install the Alpaca Python SDK:
 
-```bash
+```bash```bash
 pip install alpaca-trade-api
