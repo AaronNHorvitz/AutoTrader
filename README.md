@@ -60,7 +60,7 @@ For more details, see Alpaca’s guide: [Connect to Alpaca API](https://alpaca.m
 
 
 # File Structure
-
+```
 stat_656_autotrader/
 ├── Sandbox/            
 |    ├── experiment1/        # ~Play space (~optional)
@@ -90,4 +90,4 @@ stat_656_autotrader/
 ├── setup.py                 # ~Creates DBs, populates tickers
 ├── .gitignore               # ~Protect files
 ├── environment.yaml         # ~Anacond
-
+```
