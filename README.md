@@ -48,15 +48,10 @@ Key="put_key_here"
 Secret="put_secret_here"
 ```
 
-
 For more details, see Alpaca’s guide: [Connect to Alpaca API](https://alpaca.markets/learn/connect-to-alpaca-api).
 
 ## Step 5: Install Dependencies
 -- Instructions to run the 'environment.yaml' file--
-
-## 
-
-
 
 
 # File Structure
@@ -81,6 +76,9 @@ stat_656_autotrader/
 |    |   ├── db_setup/       # ~DB creation (~setup.sql moved here)
 |    |   └── db_updates/     # ~DB updates
 |    ├── execution/          # ~Trade execution
+|    ├── dashboard/          # ~Dashboard logic
+|    |   ├── templates/      # ~HTML (~e.g., dashboard.html)
+|    |   └── static/         # ~CSS, JS
 |    ├── test/               # ~Unit tests
 |    ├── utils/              # ~Helpers 
 |    ├── config.py           # ~BASE_URL, settings
@@ -91,3 +89,4 @@ stat_656_autotrader/
 ├── .gitignore               # ~Protect files
 ├── environment.yaml         # ~Anacond
 ```
+
