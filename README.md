@@ -1,6 +1,6 @@
 # STAT 656 Autotrader
 
-Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project helps you fetch a list of all stock and ETF tickers (~11,000+) currently tracked by Alpaca, store them in a SQLite database, and then execute an autotrader. 
+Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project helps you fetch a list of all stock and ETF tickers currently tracked by Alpaca, store them in a SQLite database, and then execute an autotrader. 
 
 ## Prerequisites
 
@@ -29,26 +29,25 @@ Before you can download tickers, you need an Alpaca account and API keys. Alpaca
 - **Visit**: [Alpaca Markets](https://alpaca.markets/)
 - **Action**: Click “Get Started” (~top right) or “Sign Up” (~center).
 - **Details**: Enter your email and create a password.
-- **Result**: You’re in! (~welcome email lands quick).
 
 ### 2. Switch to Paper Trading
 - **Log In**: Head to [app.alpaca.markets](https://app.alpaca.markets/).
 - **Toggle**: Top left corner—switch from “Live” to “Paper”.
-- **Why**: Paper trading gives you API access without funding (~perfect for testing!).
+- Paper trading gives you API access without funding.
 
 ### 3. Generate API Keys
 - **Dashboard**: Scroll to “Your API Keys” (~right side).
 - **Click**: “Generate New Keys” (~or “View” if already there).
-- **Copy**: Grab your **API Key ID** (e.g., `PK123...`) and **Secret Key** (e.g., `abc...xyz`).
-- **Time**: ~5 minutes (~3:55 PM PDT)—you’re API-ready!
 
 ### 4. Type the Key and Secret into the .secrets file and save. 
+- **Create** Create an empty text file.
+- **Copy**: Grab your **API Key ID** (e.g., `PK123...`) and **Secret Key** (e.g., `abc...xyz`).
+- **Paste**: Paste your credentials in the text file so it looks like this:
 ```
 Key="put_key_here"
 Secret="put_secret_here"
 ```
-
-For more details, see Alpaca’s guide: [Connect to Alpaca API](https://alpaca.markets/learn/connect-to-alpaca-api).
+- **Save**: Save your credentials as '.secrets' in the 'src' directory. 
 
 ## Step 5: Install Dependencies
 -- Instructions to run the 'environment.yaml' file--
@@ -87,6 +86,7 @@ stat_656_autotrader/
 |    └── main.py             # ~Entry (~optional)
 ├── setup.py                 # ~Creates DBs, populates tickers
 ├── .gitignore               # ~Protect files
-├── environment.yaml         # ~Anacond
+├── environment.yaml         # ~Anaconda
 ```
 
+For more details, see Alpaca’s guide: [Connect to Alpaca API](https://alpaca.markets/learn/connect-to-alpaca-api).
