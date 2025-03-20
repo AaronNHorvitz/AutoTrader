@@ -11,6 +11,9 @@ ENV/
 dist/
 build/
 
+# Ignore SQLite databases
+databases/*.db
+
 # Jupyter Notebook
 *.ipynb_checkpoints/
 
