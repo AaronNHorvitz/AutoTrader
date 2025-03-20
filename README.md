@@ -20,7 +20,6 @@ Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project 
   git clone https://github.com/YOUR_USERNAME/stat_656_autotrader.git
   cd stat_656_autotrader
 
-
 ## Step 3: Get an Alpaca Account
 
 Before you can download tickers, you need an Alpaca account and API keys. Alpaca offers free paper trading (~$0)—no real money, just data and trades to play with. Here’s how to set it up:
@@ -67,6 +66,8 @@ stat_656_autotrader/
 |    └── prior_forecasts.db  # ~Forecast checks (~TBD)
 ├── logs/                    # ~Log files (~e.g., setup.log)
 |    └── setup.log           # ~Setup run logs
+├── credentials/
+|    └── .secrets            # ~Keys (~Key='...')
 ├── src/         
 |    ├── models/             
 |    |   ├── forecasting/    # ~Prediction logic
@@ -81,7 +82,6 @@ stat_656_autotrader/
 |    ├── test/               # ~Unit tests
 |    ├── utils/              # ~Helpers 
 |    ├── config.py           # ~BASE_URL, settings
-|    ├── .secrets            # ~Keys (~Key='...')
 |    ├── get_tickers.py      # ~Ticker fetch (~updated with logging)
 |    └── main.py             # ~Entry (~optional)
 ├── setup.py                 # ~Creates DBs, populates tickers
