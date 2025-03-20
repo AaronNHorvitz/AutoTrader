@@ -52,7 +52,7 @@ Secret="put_secret_here"
 -- Instructions to run the 'environment.yaml' file--
 
 
-# File Structure
+# File Structure/ Project Architecture
 ```
 stat_656_autotrader/
 ├── Sandbox/            
