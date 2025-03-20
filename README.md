@@ -87,6 +87,7 @@ stat_656_autotrader/
 ├── setup.py                 # ~Creates DBs, populates tickers
 ├── .gitignore               # ~Protect files
 ├── environment.yaml         # ~Anaconda
+└── README.md                # ~Readme.md file 
 ```
 
 For more details, see Alpaca’s guide: [Connect to Alpaca API](https://alpaca.markets/learn/connect-to-alpaca-api).
