@@ -46,7 +46,7 @@ Before you can download tickers, you need an Alpaca account and API keys. Alpaca
 Key="put_key_here"
 Secret="put_secret_here"
 ```
-- **Save**: Save your credentials as '.secrets' in the 'src' directory. 
+- **Save**: Save your credentials as '.secrets' in the 'credentials' directory. 
 
 ## Step 5: Install Dependencies
 -- Instructions to run the 'environment.yaml' file--
