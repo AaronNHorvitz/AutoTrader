@@ -58,7 +58,7 @@ stat_656_autotrader/
 ├── Sandbox/            
 |    ├── experiment1/        # ~Play space (~optional)
 ├── Notebooks/    
-|    ├── get_tickers.ipynb   # ~Demos
+|    ├── 001 Connecting to Alpaca Tutorial.ipynb.ipynb   # ~Demos
 ├── databases/    
 |    ├── stock_prices.db     # ~Tickers, OHLC (~3.75 GB)
 |    ├── exogenous.db        # ~Exogenous (~TBD)
