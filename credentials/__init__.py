@@ -10,8 +10,8 @@ if secrets_path.exists():
         for line in f:
             if '=' in line:
                 key, value = line.strip().split('=', 1)
-                secrets[key] = value
-    # Check if required keys are loaded
+                # Remove quotes from value (~"..." or '...')
+                secrets[key] = value.strip('"').strip("'")
     if not all(k in secrets for k in ['Key', 'Secret', 'Endpoint']):
         raise ValueError("credentials/.secrets missing required keys (Key, Secret, Endpoint)—add your Alpaca API credentials!")
 else:
