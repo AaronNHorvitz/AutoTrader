@@ -1,15 +1,15 @@
 # STAT 656 Autotrader
 
-Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project fetches stock and ETF tickers from Alpaca, stores them in a SQLite database, integrates exogenous data (~YFinance/FRED ~`$0`), and executes an autotrader (~175 stocks ~OHLC ~2002-2025 ~1-5+ days ~`$0`).
+Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project fetches stock and ETF tickers from Alpaca, stores them in a SQLite database, integrates exogenous data (YFinance/FRED), and executes an autotrader (175 stocks OHLC 2002-2025 1-5+ days).
 
 ## Prerequisites
 
 - **Python 3.11+**: Installed on your system.
-- **Libraries**: `pandas`, `requests`, `sqlite3` (standard), `alpaca-trade-api` (`pip install alpaca-trade-api`), `yfinance`, `fredapi` (~for exogenous data ~`$0`).
+- **Libraries**: `pandas`, `requests`, `sqlite3` (standard), `alpaca-trade-api` (`pip install alpaca-trade-api`), `yfinance`, `fredapi` (for exogenous data ).
 
 ## Setup
 
-Follow these steps to set up the STAT 656 Autotrader (~`$0`):
+Follow these steps to set up the STAT 656 Autotrader ():
 
 ### Step 1: Install Prerequisites
 
@@ -34,7 +34,7 @@ Follow these steps to set up the STAT 656 Autotrader (~`$0`):
   cd stat_656_autotrader
 
 ### Step 2: Set Up the Environment
-Create Environment: Use environment.yaml to set up dependencies (~$0):
+Create Environment: Use environment.yaml to set up dependencies ($0):
 ```
 conda env create -f environment.yaml
 conda activate stat_656_autotrader
@@ -80,9 +80,9 @@ Run the setup.py script to check and create the SQLite databases (6 .db files: a
   python setup.py
   ```
 What it does:
-~Checks if databases exist in databases/ (~creates them if missing ~$0).
-~Sets up 13 tables (~with foreign keys ~see ~$0).
-~Logs actions to logs/setup.log (~for debugging ~$0).
+Checks if databases exist in databases/ (creates them if missing $0).
+Sets up 13 tables (with foreign keys see $0).
+Logs actions to logs/setup.log (for debugging $0).
 
 Expected Output:
 ```
@@ -162,7 +162,7 @@ stat_656_autotrader/
 ```
 ## Data Dictionary/ Data Architecture
 
-Below is the data dictionary for the database architecture (6 `.db` files, 13 tables `$0`). All timestamps use ISO 8601 format (e.g., "2025-03-22 13:00:00" TEXT in SQLite sortable `$0`).
+Below is the data dictionary for the database architecture (6 `.db` files, 13 tables ). All timestamps use ISO 8601 format (e.g., "2025-03-22 13:00:00" TEXT in SQLite sortable ).
 
 #### 1. `assets.db` (Asset Data)
 - **`asset_metadata`** (Asset details):
