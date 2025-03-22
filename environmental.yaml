@@ -1,0 +1,29 @@
+name: autotrader
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11  # Python 3.11+
+  # Data Handling and Extraction (Alpaca, YFinance, FRED)
+  - alpaca-trade-api  # Alpaca API for trading and asset data
+  - yfinance          # YFinance for price and exogenous data
+  - fredapi           # FRED API for macroeconomic indicators
+  - requests          # HTTP requests for API calls
+  - pandas            # Data manipulation and analysis
+  - numpy             # Numerical operations (complements pandas)
+  # Modeling Libraries
+  - scikit-learn      # Machine learning (e.g., regression, clustering)
+  - scipy             # Scientific computing (e.g., stats, optimization)
+  - statsmodels       # Statistical models (e.g., ARIMA for time series)
+  - tensorflow        # Deep learning (e.g., neural networks for forecasting)
+  - pymc              # MCMC models (Bayesian inference)
+  # Visualization Libraries
+  - matplotlib        # Plotting (e.g., visualize forecasts)
+  - seaborn           # Enhanced plotting (pairs with matplotlib)
+  - flask             # Web framework (e.g., dashboard)
+  # Development Tools
+  - jupyter           # Notebooks (for .ipynb development)
+  - pytest            # Unit testing (for tests/)
+  - tqdm              # Progress bars for long-running tasks
+  - black             # Code formatting (PEP-8 compliance)
+  - flake8            # Linting (code quality)
