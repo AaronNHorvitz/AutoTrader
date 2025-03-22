@@ -1,42 +1,46 @@
 # STAT 656 Autotrader
 
-Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project helps you fetch a list of all stock and ETF tickers currently tracked by Alpaca, store them in a SQLite database, and then execute an autotrader.
+Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project fetches stock and ETF tickers from Alpaca, stores them in a SQLite database, integrates exogenous data (~YFinance/FRED ~`$0`), and executes an autotrader (~175 stocks ~OHLC ~2002-2025 ~1-5+ days ~`$0`).
 
 ## Prerequisites
 
 - **Python 3.11+**: Installed on your system.
-- **Libraries**: `pandas`, `requests`, `sqlite3` (standard), and `alpaca-trade-api` (`pip install alpaca-trade-api`).
+- **Libraries**: `pandas`, `requests`, `sqlite3` (standard), `alpaca-trade-api` (`pip install alpaca-trade-api`), `yfinance`, `fredapi` (~for exogenous data ~`$0`).
 
-## Step 1: Set Up Your Environment
+## Setup
 
-### 1. Install Git
-- **Windows**: [git-scm.com](https://git-scm.com/download/win).
-- **Mac**: `brew install git` (`brew.sh`) or [git-scm.com](https://git-scm.com/download/mac).
-- **Check**: `git --version`.
+Follow these steps to set up the STAT 656 Autotrader (~`$0`):
 
-### 2. Install Anaconda
-- **Download Anaconda**: [Anaconda.com](https://www.anaconda.com/products/distribution)
-- **Install**: Run the downloaded installer and follow the installation instructions.
-- **Verify**: Open your terminal and type `conda --version` to ensure Anaconda is installed correctly.
+### Step 1: Install Prerequisites
 
-### 3. Check SQLite Installation
-- **Windows/Mac**: SQLite comes pre-installed with Anaconda. To verify, open a terminal and run:
-  ```bash
-  sqlite3 --version
-  ```
-- If not available, install it using:
-  ```bash
-  conda install -c conda-forge sqlite
-  ```
+#### 1. Install Git
+- **Windows**: Download from [git-scm.com](https://git-scm.com/download/win).
+- **Mac**: Run `brew install git` ([brew.sh](https://brew.sh)) or download from [git-scm.com](https://git-scm.com/download/mac).
+- **Verify**: `git --version`.
 
-### 4. Clone the Repo
+#### 2. Install Anaconda
+- **Download**: [Anaconda.com](https://www.anaconda.com/products/distribution).
+- **Install**: Follow the installer instructions.
+- **Verify**: `conda --version`.
+
+#### 3. Check SQLite
+- **Anaconda**: SQLite is pre-installed. Verify: `sqlite3 --version`.
+- **Install (if needed)**: `conda install -c conda-forge sqlite`.
+
+#### 4. Clone the Repository
 - **Terminal**: 
   ```bash
   git clone https://github.com/YOUR_USERNAME/stat_656_autotrader.git
   cd stat_656_autotrader
-  ```
 
-## Step 2: Get an Alpaca Account
+## Step 2: Set Up the Environment
+Create Environment: Use environment.yaml to set up dependencies (~$0):
+```
+conda env create -f environment.yaml
+conda activate stat_656_autotrader
+```
+
+## Step 3: Get an Alpaca Account
 
 Before you can download tickers, you need an Alpaca account and API keys. Alpaca offers free paper trading ($0)—no real money, just data and trades to play with. Here’s how to set it up:
 
@@ -58,11 +62,39 @@ Before you can download tickers, you need an Alpaca account and API keys. Alpaca
 - **Create**: Create an empty text file.
 - **Copy**: Grab your **API Key ID** (e.g., `PK123...`) and **Secret Key** (e.g., `abc...xyz`).
 - **Paste**: Paste your credentials in the text file so it looks like this:
+  
+# credentials/.secrets
   ```
-  Key="put_key_here"
-  Secret="put_secret_here"
+  ALPACA_API_KEY="your_alpaca_key"
+  ALPACA_SECRET_KEY="your_alpaca_secret"
+  ALPAKA_ENDPOINT_URL=""
   ```
 - **Save**: Save your credentials as '.secrets' in the 'credentials' directory.
+
+## Step 3: Run 'setup.py' to Initialize and Populate the Databases
+
+Run the setup.py script to check and create the SQLite databases (6 .db files: assets.db, portfolio_management.db, accounting.db, modeling.db, exogenous.db, db_change_log.db):
+
+- **Windows/Mac/Linux**: Open a terminal, navigate to 'STAT_656_AUTOTRADER/src/ and run:
+  ```
+  python setup.py
+  ```
+
+What it does:
+~Checks if databases exist in databases/ (~creates them if missing ~$0).
+~Sets up 13 tables (~with foreign keys ~see ~$0).
+~Logs actions to logs/setup.log (~for debugging ~$0).
+
+Expected Output:
+```
+Creating assets.db...
+Tables in assets.db created/verified.
+Creating portfolio_management.db...
+Tables in portfolio_management.db created/verified.
+[... repeats for all 6 DBs ...]
+All databases initialized successfully!
+```
+
 
 ## File Structure/ Project Architecture
 
