@@ -69,39 +69,62 @@ Before you can download tickers, you need an Alpaca account and API keys. Alpaca
 
 ```
 stat_656_autotrader/
-├── Sandbox/            
-|    ├── experiment1/        # ~Play space (~optional)
-├── Notebooks/    
-|    ├── 001 Connecting to Alpaca Tutorial.ipynb.ipynb   # ~Demos
-├── databases/    
-|    ├── stock_prices.db     # ~Tickers, OHLC (~3.75 GB)
-|    ├── exogenous.db        # ~Exogenous (~TBD)
-|    ├── transactions.db     # ~Trades (~TBD)
-|    └── prior_forecasts.db  # ~Forecast checks (~TBD)
-├── logs/                    # ~Log files (~e.g., setup.log)
-|    └── setup.log           # ~Setup run logs
-├── credentials/
-|    └── .secrets            # ~Keys (~Key='...')
-├── src/         
-|    ├── models/             
-|    |   ├── forecasting/    # ~Prediction logic
-|    |   └── stock_trading/  # ~Trading logic
-|    ├── etl/             
-|    |   ├── db_setup/       # ~DB creation (~setup.sql moved here)
-|    |   └── db_updates/     # ~DB updates
-|    ├── execution/          # ~Trade execution
-|    ├── dashboard/          # ~Dashboard logic
-|    |   ├── templates/      # ~HTML (~e.g., dashboard.html)
-|    |   └── static/         # ~CSS, JS
-|    ├── test/               # ~Unit tests
-|    ├── utils/              # ~Helpers 
-|    ├── config.py           # ~BASE_URL, settings
-|    ├── get_tickers.py      # ~Ticker fetch (~updated with logging)
-|    └── main.py             # ~Entry (~optional)
-├── setup.py                 # ~Creates DBs, populates tickers
-├── .gitignore               # ~Protect files
-├── environment.yaml         # ~Anaconda
-└── README.md                # ~Readme.md file 
-```
 
-For more details, see Alpaca’s guide: [Connect to Alpaca API](https://alpaca.markets/learn/connect-to-alpaca-api).
+├── Sandbox/
+|    |
+|    └──  test_notebook/        # ~Play space for experiments
+|    
+├── Notebooks/
+|    |
+|    ├── 001_Connecting_to_Alpaca_Tutorial.ipynb   # ~Demos (~e.g., Alpaca API setup)
+|    ├── 002_Create_and_Update_Database.ipynb      
+|    └── 003_Query_and_Visualize_Data.ipynb              
+|
+├── databases/
+|    |
+|    ├── assets.db             # ~Asset metadata, prices, dividends, actions 
+|    ├── portfolio_management.db  # ~Holdings, transactions, KPIs 
+|    ├── accounting.db         # ~Accounts, balances, cash flows, taxes 
+|    ├── modeling.db           # ~Model & actual forecasts 
+|    ├── exogenous.db          # ~Exogenous metadata & values
+|    └── db_change_log.db      # ~Audit trail 
+|    |
+├── logs/                      # ~Log files
+|    ├── setup.log             # ~Setup run logs
+|    └── fetch.log             # ~New 
+| 
+├── credentials/
+|    └── .secrets              # ~API keys 
+|    
+├── src/
+|    |
+|    ├── models/
+|    |   |
+|    |   ├── forecasting/      # ~Prediction logic 
+|    |   └── trading/          # ~Trading logic 
+|    |
+|    ├── etl/
+|    |   |
+|    |   ├── db_setup/         # ~DB creation scripts (~e.g., setup.sql or .py)
+|    |   ├── db_updates/       # ~DB update scripts (~e.g., insert prices, exogenous)
+|    |   └── data_fetch/       # ~New (~fetch scripts ~Alpaca/YFinance/FRED)
+|    |
+|    ├── execution/            # ~Trade execution (~Alpaca API calls)
+|    ├── dashboard/            # ~Dashboard logic (~e.g., Flask/Dash)
+|    |   ├── templates/        # ~HTML 
+|    |   └── static/           # ~CSS, JS 
+|    | 
+|    ├── tests/                # ~Unit tests 
+|    |   ├── test_models.py    # ~Test forecasting/trading
+|    |   └── test_etl.py       # ~Test DB setup/updates
+|    |
+|    ├── utils/                # ~Helper functions (~e.g., logging, date utils)
+|    ├── config.py             # ~Settings (~BASE_URL, DB paths, API endpoints)
+|    ├── get_tickers.py        # ~Fetch asset metadata (~Alpaca ~updated with logging)
+|    └── main.py               # ~Entry point (~runs pipeline)
+|    
+├── setup.py                   # ~Creates DBs, populates initial metadata
+├── .gitignore                 # ~Protects secrets, logs, DBs (~e.g., *.db, .secrets)
+├── environment.yaml           # ~Anaconda env (~dependencies ~e.g., pandas, yfinance)
+└── README.md                  # ~Project overview (~this file)
+```
