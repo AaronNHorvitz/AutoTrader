@@ -64,7 +64,7 @@ Before you can download tickers, you need an Alpaca account and API keys. Alpaca
   ```
 - **Save**: Save your credentials as '.secrets' in the 'credentials' directory.
 
-
+Here - I updated it. 
 ## File Structure/ Project Architecture
 
 ```
@@ -110,6 +110,7 @@ stat_656_autotrader/
 |    |   └── data_fetch/       # ~New (~fetch scripts ~Alpaca/YFinance/FRED)
 |    |
 |    ├── execution/            # ~Trade execution (~Alpaca API calls)
+|    |
 |    ├── dashboard/            # ~Dashboard logic (~e.g., Flask/Dash)
 |    |   ├── templates/        # ~HTML 
 |    |   └── static/           # ~CSS, JS 
