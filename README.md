@@ -33,53 +33,52 @@ Follow these steps to set up the STAT 656 Autotrader (~`$0`):
   git clone https://github.com/YOUR_USERNAME/stat_656_autotrader.git
   cd stat_656_autotrader
 
-## Step 2: Set Up the Environment
+### Step 2: Set Up the Environment
 Create Environment: Use environment.yaml to set up dependencies (~$0):
 ```
 conda env create -f environment.yaml
 conda activate stat_656_autotrader
 ```
 
-## Step 3: Get an Alpaca Account
+### Step 3: Get an Alpaca Account
 
 Before you can download tickers, you need an Alpaca account and API keys. Alpaca offers free paper trading ($0)—no real money, just data and trades to play with. Here’s how to set it up:
 
-### 1. Sign Up
+#### - 1. Sign Up
 - **Visit**: [Alpaca Markets](https://alpaca.markets/)
 - **Action**: Click “Get Started” (top right) or “Sign Up” (center).
 - **Details**: Enter your email and create a password.
 
-### 2. Switch to Paper Trading
+#### - 2. Switch to Paper Trading
 - **Log In**: Head to [app.alpaca.markets](https://app.alpaca.markets/).
 - **Toggle**: Top left corner—switch from “Live” to “Paper”.
 - Paper trading gives you API access without funding.
 
-### 3. Generate API Keys
+#### - 3. Generate API Keys
 - **Dashboard**: Scroll to “Your API Keys” (right side).
 - **Click**: “Generate New Keys” (or “View” if already there).
 
-### 4. Type the Key and Secret into the .secrets file and save.
+#### - 4. Type the Key and Secret into the .secrets file and save.
 - **Create**: Create an empty text file.
 - **Copy**: Grab your **API Key ID** (e.g., `PK123...`) and **Secret Key** (e.g., `abc...xyz`).
 - **Paste**: Paste your credentials in the text file so it looks like this:
-  
-# credentials/.secrets
+- **Save**: Save your credentials as '.secrets' in the 'credentials' directory.
+
+#### This is how the text should look inside the 'credentials/.secrets' file. 
   ```
   ALPACA_API_KEY="your_alpaca_key"
   ALPACA_SECRET_KEY="your_alpaca_secret"
   ALPAKA_ENDPOINT_URL=""
   ```
-- **Save**: Save your credentials as '.secrets' in the 'credentials' directory.
 
-## Step 3: Run 'setup.py' to Initialize and Populate the Databases
+### Step 4: Run 'setup.py' to Initialize and Populate the Databases
 
 Run the setup.py script to check and create the SQLite databases (6 .db files: assets.db, portfolio_management.db, accounting.db, modeling.db, exogenous.db, db_change_log.db):
 
-- **Windows/Mac/Linux**: Open a terminal, navigate to 'STAT_656_AUTOTRADER/src/ and run:
+#### - 1. Open a terminal, navigate to `STAT_656_AUTOTRADER/src/` and run:
   ```
   python setup.py
   ```
-
 What it does:
 ~Checks if databases exist in databases/ (~creates them if missing ~$0).
 ~Sets up 13 tables (~with foreign keys ~see ~$0).
