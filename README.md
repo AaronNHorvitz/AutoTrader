@@ -120,6 +120,7 @@ stat_656_autotrader/
 |    |
 |    ├── utils/                # Helper functions (e.g., logging, date utils)
 |    ├── config.py             # Settings (BASE_URL, DB paths, API endpoints)
+|    ├── db_schema.py          # Database schema used during initial setup. 
 |    ├── get_tickers.py        # Fetch asset metadata (Alpaca updated with logging)
 |    └── main.py               # Entry point (runs pipeline)
 |    
