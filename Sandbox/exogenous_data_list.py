@@ -1,5 +1,3 @@
-import json 
-
 exog_symbols_data = [
 
     # Commodities (~Futures ~Energy)
