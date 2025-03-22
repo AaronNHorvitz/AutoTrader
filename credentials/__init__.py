@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-# Load secrets from credentials/.secrets (~relative to credentials/)
+# Load secrets from credentials/.secrets
 secrets_path = Path(__file__).parent / '.secrets'
 secrets = {}
 if secrets_path.exists():
@@ -17,7 +17,7 @@ if secrets_path.exists():
 else:
     raise FileNotFoundError("credentials/.secrets not found—add your Alpaca API keys (Key, Secret, Endpoint)!")
 
-# Export credentials (~for 'from credentials import ...')
-API_KEY = secrets['Key']
-SECRET_KEY = secrets['Secret']
-ENDPOINT_URL = secrets['Endpoint']
+# Export credentials
+ALPACA_API_KEY = secrets['ALPACA_API_KEY']
+ALPACA_SECRET_KEY = secrets['ALPACA_SECRET_KEY']
+ALPAKA_ENDPOINT_URL = secrets['ALPAKA_ENDPOINT_URL']
