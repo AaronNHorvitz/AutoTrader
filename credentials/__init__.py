@@ -12,7 +12,7 @@ if secrets_path.exists():
                 key, value = line.strip().split('=', 1)
                 # Remove quotes from value (~"..." or '...')
                 secrets[key] = value.strip('"').strip("'")
-    if not all(k in secrets for k in ['Key', 'Secret', 'Endpoint']):
+    if not all(k in secrets for k in ['ALPACA_API_KEY', 'ALPACA_SECRET_KEY', 'ALPAKA_ENDPOINT_URL']):
         raise ValueError("credentials/.secrets missing required keys (Key, Secret, Endpoint)—add your Alpaca API credentials!")
 else:
     raise FileNotFoundError("credentials/.secrets not found—add your Alpaca API keys (Key, Secret, Endpoint)!")
