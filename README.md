@@ -37,7 +37,7 @@ Follow these steps to set up the STAT 656 Autotrader ():
 Create Environment: Use environment.yaml to set up dependencies ($0):
 ```
 conda env create -f environment.yaml
-conda activate stat_656_autotrader
+conda activate autotrader
 ```
 
 ### Step 3: Get an Alpaca Account
