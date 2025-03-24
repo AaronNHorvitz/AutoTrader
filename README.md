@@ -34,7 +34,7 @@ Follow these steps to set up the STAT 656 Autotrader ():
   cd stat_656_autotrader
 
 ### Step 2: Set Up the Environment
-Create Environment: Use environment.yaml to set up dependencies ($0):
+Create Environment: Use environment.yaml to set up dependencies. NOTE: This could take more than an hour to run. 
 ```
 conda env create -f environment.yaml
 conda activate autotrader
