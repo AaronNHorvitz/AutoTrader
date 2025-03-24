@@ -14,7 +14,6 @@ dependencies:
   - scikit-learn
   - scipy
   - statsmodels
-  - tensorflow
   - pymc
   - matplotlib
   - seaborn
@@ -23,6 +22,5 @@ dependencies:
   - pytest
   - tqdm
   - black
-  - flake8
   - pip:
-      - alpaca-trade-api
+      - alpaca_trade_api
