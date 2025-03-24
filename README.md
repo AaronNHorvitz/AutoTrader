@@ -40,6 +40,13 @@ conda env create -f environment.yaml
 conda activate autotrader
 ```
 
+After creating your environment, run the following command to ensure the autotrader environment appears in JupyterLab, Jupyter Notebook, and VS Code:
+
+```
+python -m ipykernel install --user --name=autotrader --display-name "Python (autotrader)"
+```
+This registers your environment as a Jupyter kernel and makes it selectable in notebook interfaces and IDEs like VS Code.
+
 ### Step 3: Get an Alpaca Account
 
 Before you can download tickers, you need an Alpaca account and API keys. Alpaca offers free paper trading ($0)—no real money, just data and trades to play with. Here’s how to set it up:
