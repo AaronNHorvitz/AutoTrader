@@ -142,11 +142,16 @@ stat_656_autotrader/
 |    |
 |    ├── etl/
 |    |   |
-|    |   ├── db_setup/         # DB creation scripts (e.g., setup.sql or .py)
-|    |   ├── db_updates/       # DB update scripts (e.g., insert prices, exogenous)
-|    |   └── data_fetch/       # New (fetch scripts Alpaca/YFinance/FRED)
+|    |   ├── populate_tickers.py   
+|    |   ├── populate_prices.py
+|    |   ├── update_prices.py
+|    |   └── <add files as needed>      
 |    |
 |    ├── execution/            # Trade execution (Alpaca API calls)
+|    |
+|    ├── visulazations/       
+|    |   ├── stock_price_trends  
+|    |   └── <add files as needed>      
 |    |
 |    ├── dashboard/            # Dashboard logic (e.g., Flask/Dash)
 |    |   ├── templates/        # HTML 
@@ -156,7 +161,12 @@ stat_656_autotrader/
 |    |   ├── test_models.py    # Test forecasting/trading
 |    |   └── test_etl.py       # Test DB setup/updates
 |    |
-|    ├── utils/                # Helper functions (e.g., logging, date utils)
+|    ├── utils/                
+|    |   ├── db_utils.py
+|    |   ├── alpaca_utils.py
+|    |   ├── date_utils.py (handles date calculations)
+|    |   └── <add files as needed> 
+|    |
 |    ├── config.py             # Settings (BASE_URL, DB paths, API endpoints)
 |    ├── db_schema.py          # Database schema used during initial setup. 
 |    ├── get_tickers.py        # Fetch asset metadata (Alpaca updated with logging)
