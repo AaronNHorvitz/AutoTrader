@@ -147,7 +147,10 @@ stat_656_autotrader/
 |    |   ├── update_prices.py
 |    |   └── <add files as needed>      
 |    |
-|    ├── execution/            # Trade execution (Alpaca API calls)
+|    ├── statistics/
+|    |   └── smoothers.py  
+|    |
+|    ├── execution/            # Trade execution 
 |    |
 |    ├── visulazations/       
 |    |   ├── stock_price_trends  
