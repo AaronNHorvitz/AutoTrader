@@ -1,4 +1,5 @@
 # src/db_schema.py
+
 DATABASES = {
     "assets.db": [
         """
@@ -8,15 +9,11 @@ DATABASES = {
             name TEXT,
             exchange TEXT,
             asset_type TEXT,
-            sector TEXT,
-            industry TEXT,
-            currency TEXT,
-            has_dividend INTEGER,
             is_active INTEGER,
             date_added TEXT,
             date_removed TEXT,
-            fetched_at TEXT  -- ISO 8601 timestamp (e.g., '2025-03-22 13:00:00')
-        )
+            fetched_at TEXT
+        );
         """,
         """
         CREATE TABLE IF NOT EXISTS asset_dividends (
@@ -30,9 +27,9 @@ DATABASES = {
             currency TEXT,
             dividend_type TEXT,
             source TEXT,
-            fetched_at TEXT,  -- ISO 8601 timestamp
+            fetched_at TEXT,
             FOREIGN KEY (asset_id) REFERENCES asset_metadata(asset_id)
-        )
+        );
         """,
         """
         CREATE TABLE IF NOT EXISTS corporate_actions (
@@ -45,9 +42,9 @@ DATABASES = {
             ratio REAL,
             cash_value REAL,
             notes TEXT,
-            fetched_at TEXT,  -- ISO 8601 timestamp
+            fetched_at TEXT,
             FOREIGN KEY (asset_id) REFERENCES asset_metadata(asset_id)
-        )
+        );
         """,
         """
         CREATE TABLE IF NOT EXISTS asset_prices (
@@ -60,11 +57,12 @@ DATABASES = {
             close REAL,
             adjusted_close REAL,
             volume INTEGER,
-            fetched_at TEXT,  -- ISO 8601 timestamp
+            fetched_at TEXT,
             FOREIGN KEY (asset_id) REFERENCES asset_metadata(asset_id)
-        )
+        );
         """
     ],
+
     "portfolio_management.db": [
         """
         CREATE TABLE IF NOT EXISTS asset_holdings (
@@ -74,10 +72,10 @@ DATABASES = {
             date TEXT,
             quantity REAL,
             avg_cost REAL,
-            last_updated TEXT,  -- ISO 8601 timestamp
+            last_updated TEXT,
             FOREIGN KEY (account_id) REFERENCES record_of_accounts(account_id),
             FOREIGN KEY (asset_id) REFERENCES asset_metadata(asset_id)
-        )
+        );
         """,
         """
         CREATE TABLE IF NOT EXISTS transactions (
@@ -88,10 +86,10 @@ DATABASES = {
             quantity REAL,
             price REAL,
             fees REAL,
-            timestamp TEXT,  -- ISO 8601 timestamp
+            timestamp TEXT,
             FOREIGN KEY (account_id) REFERENCES record_of_accounts(account_id),
             FOREIGN KEY (asset_id) REFERENCES asset_metadata(asset_id)
-        )
+        );
         """,
         """
         CREATE TABLE IF NOT EXISTS kpi_tracker (
@@ -108,11 +106,12 @@ DATABASES = {
             beta REAL,
             volatility REAL,
             trading_days INTEGER,
-            timestamp TEXT,  -- ISO 8601 timestamp
+            timestamp TEXT,
             FOREIGN KEY (account_id) REFERENCES record_of_accounts(account_id)
-        )
+        );
         """
     ],
+
     "accounting.db": [
         """
         CREATE TABLE IF NOT EXISTS record_of_accounts (
@@ -123,7 +122,7 @@ DATABASES = {
             status TEXT,
             date_opened TEXT,
             date_closed TEXT
-        )
+        );
         """,
         """
         CREATE TABLE IF NOT EXISTS account_balances (
@@ -136,7 +135,7 @@ DATABASES = {
             total_equity REAL,
             liabilities REAL,
             FOREIGN KEY (account_id) REFERENCES record_of_accounts(account_id)
-        )
+        );
         """,
         """
         CREATE TABLE IF NOT EXISTS record_of_cash_flows (
@@ -148,7 +147,7 @@ DATABASES = {
             fees REAL,
             note TEXT,
             FOREIGN KEY (account_id) REFERENCES record_of_accounts(account_id)
-        )
+        );
         """,
         """
         CREATE TABLE IF NOT EXISTS tax_transactions (
@@ -162,9 +161,10 @@ DATABASES = {
             date_recorded TEXT,
             FOREIGN KEY (account_id) REFERENCES record_of_accounts(account_id),
             FOREIGN KEY (transaction_id) REFERENCES transactions(transaction_id)
-        )
+        );
         """
     ],
+
     "modeling.db": [
         """
         CREATE TABLE IF NOT EXISTS model_forecasts (
@@ -177,7 +177,7 @@ DATABASES = {
             horizon_days INTEGER,
             model_version TEXT,
             FOREIGN KEY (asset_id) REFERENCES asset_metadata(asset_id)
-        )
+        );
         """,
         """
         CREATE TABLE IF NOT EXISTS actual_forecasts (
@@ -186,9 +186,10 @@ DATABASES = {
             actual_return REAL,
             comparison_date TEXT,
             FOREIGN KEY (forecast_id) REFERENCES model_forecasts(forecast_id)
-        )
+        );
         """
     ],
+
     "exogenous.db": [
         """
         CREATE TABLE IF NOT EXISTS exogenous_metadata (
@@ -203,8 +204,8 @@ DATABASES = {
             lag REAL,
             in_use INTEGER,
             date_added TEXT,
-            last_fetch TEXT  -- ISO 8601 timestamp
-        )
+            last_fetch TEXT
+        );
         """,
         """
         CREATE TABLE IF NOT EXISTS exogenous_vals (
@@ -216,11 +217,12 @@ DATABASES = {
             low REAL,
             close REAL,
             adjusted_close REAL,
-            fetched_at TEXT,  -- ISO 8601 timestamp
+            fetched_at TEXT,
             FOREIGN KEY (exog_id) REFERENCES exogenous_metadata(exog_id)
-        )
+        );
         """
     ],
+
     "db_change_log.db": [
         """
         CREATE TABLE IF NOT EXISTS change_log (
@@ -228,10 +230,10 @@ DATABASES = {
             table_name TEXT,
             change_type TEXT,
             change_detail TEXT,
-            changed_at TEXT,  -- ISO 8601 timestamp
+            changed_at TEXT,
             user TEXT,
             db_name TEXT
-        )
+        );
         """
     ]
 }

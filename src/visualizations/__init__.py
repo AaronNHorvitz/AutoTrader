@@ -1,0 +1,9 @@
+# src/visualizations/__init__.py
+
+"""
+Visualization module initialization for stat_656_autotrader.
+"""
+
+from .stock_price_trends import plot_stock_trends
+
+__all__ = ['plot_stock_trends']

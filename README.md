@@ -142,9 +142,10 @@ stat_656_autotrader/
 |    |
 |    ├── etl/
 |    |   |
-|    |   ├── populate_tickers.py   
-|    |   ├── populate_prices.py
-|    |   ├── update_prices.py
+│    │   ├── __init__.py
+│    │   ├── populate_prices.py
+│    │   ├── populate_tickers.py
+│    │   ├── update_prices.py
 |    |   └── <add files as needed>      
 |    |
 |    ├── statistics/
@@ -153,7 +154,7 @@ stat_656_autotrader/
 |    ├── execution/            # Trade execution 
 |    |
 |    ├── visulazations/       
-|    |   ├── stock_price_trends  
+|    |   ├── stock_price_trends.py  
 |    |   └── <add files as needed>      
 |    |
 |    ├── dashboard/            # Dashboard logic (e.g., Flask/Dash)
@@ -165,9 +166,9 @@ stat_656_autotrader/
 |    |   └── test_etl.py       # Test DB setup/updates
 |    |
 |    ├── utils/                
-|    |   ├── db_utils.py
-|    |   ├── alpaca_utils.py
-|    |   ├── date_utils.py (handles date calculations)
+│    │   ├── __init__.py
+│    │   ├── alpaca_utils.py
+│    │   ├── db_utils.py
 |    |   └── <add files as needed> 
 |    |
 |    ├── config.py             # Settings (BASE_URL, DB paths, API endpoints)
