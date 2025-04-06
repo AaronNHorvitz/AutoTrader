@@ -240,16 +240,12 @@ Below is the data dictionary for the database architecture (6 `.db` files, 13 ta
   - `asset_id` (INTEGER, PRIMARY KEY, AUTOINCREMENT): Unique asset ID.
   - `symbol` (TEXT, UNIQUE): Asset ticker (e.g., "AAPL").
   - `name` (TEXT): Full name (e.g., "Apple Inc.").
-  - `exchange` (TEXT): Exchange (e.g., "NASDAQ", "NYSE").
-  - `asset_type` (TEXT): Type (e.g., "Stock", "ETF", "Crypto").
-  - `sector` (TEXT): Sector (e.g., "Technology").
-  - `industry` (TEXT): Industry (e.g., "Consumer Electronics").
-  - `currency` (TEXT): Trading currency (e.g., "USD").
-  - `has_dividend` (INTEGER): 1 (true) or 0 (false) if pays dividends.
-  - `is_active` (INTEGER): 1 (tradable) or 0 (inactive Alpaca).
-  - `date_added` (TEXT): ISO 8601 date added (e.g., "2025-03-22").
-  - `date_removed` (TEXT): ISO 8601 date removed (NULL if active).
-  - `fetched_at` (TEXT): ISO 8601 timestamp of last fetch (e.g., "2025-03-22 13:00:00").
+  - `exchange` (TEXT): Exchange (e.g., "NASDAQ").
+  - `asset_type` (TEXT): Type (e.g., "Stock").
+  - `is_active` (INTEGER): 1 (active) or 0 (inactive).
+  - `date_added` (TEXT): Date added (e.g., "2025-03-22").
+  - `date_removed` (TEXT): Date removed (e.g., "2025-04-01" or NULL if active).
+  - `fetched_at` (TEXT): Timestamp of last fetch (e.g., "2025-03-22 13:00:00").
 
 - **`asset_dividends`** (Dividend history):
   - `dividend_id` (INTEGER, PRIMARY KEY, AUTOINCREMENT): Unique dividend ID.
