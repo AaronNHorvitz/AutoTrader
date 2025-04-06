@@ -9,7 +9,8 @@ from .alpaca_utils import (
     fetch_alpaca_historical_data,
     fetch_alpaca_yesterday_ohlc,
     fetch_alpaca_open_prices,
-    fetch_alpaca_latest_bars
+    fetch_alpaca_latest_bars,
+    update_stock_prices
 )
 
 from .db_utils import (
@@ -24,6 +25,7 @@ __all__ = [
     'get_alpaca_client',
     'connect_to_alpaca',
     'fetch_alpaca_stock_tickers',
+    'update_stock_prices',
     'fetch_alpaca_historical_data',
     'fetch_alpaca_yesterday_ohlc',
     'fetch_alpaca_open_prices',
