@@ -1,7 +1,7 @@
 # src/visualizations/stock_price_trends.py
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-from statistics.smoothers import smooth_lowess  # Clear import here
+from src.statistics.smoothers import smooth_lowess  # Clear import here
 
 def plot_stock_trends(dates, prices, symbol):
     smoothed_prices = smooth_lowess(prices)

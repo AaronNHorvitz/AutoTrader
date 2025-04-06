@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 from src.utils.db_utils import fetch_active_tickers, get_latest_price_date, get_db_connection
 from src.utils.alpaca_utils import get_alpaca_client, fetch_alpaca_historical_data
-from config import DB_DIR
+from src.config import DB_DIR
 
 DB_PATH = DB_DIR / 'assets.db'
 

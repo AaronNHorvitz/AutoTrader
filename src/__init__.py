@@ -18,6 +18,21 @@ from .etl import (
     update_daily_prices,
 )
 
+from .statistics import (
+    smooth_lowess,
+)
+
+from .visualizations import (
+    plot_stock_trends,
+)
+
+from src.config import (
+    DB_DIR,
+    BASE_DIR, 
+    LOG_DIR, 
+    CREDENTIALS_DIR
+)
+
 __all__ = [
     'get_alpaca_client',
     'fetch_alpaca_stock_tickers',
@@ -31,4 +46,6 @@ __all__ = [
     'populate_tickers',
     'recreate_database',
     'update_daily_prices',
+    'smooth_lowess',
+    'plot_stock_trends'
 ]

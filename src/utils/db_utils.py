@@ -2,7 +2,7 @@
 import sqlite3
 import pandas as pd
 from pathlib import Path
-from config import DB_DIR
+from src.config import DB_DIR
 
 def get_db_connection(db_name='assets.db'):
     db_path = Path(DB_DIR) / db_name
