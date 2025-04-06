@@ -5,9 +5,10 @@ from pathlib import Path
 
 from src.utils.alpaca_utils import get_alpaca_client, fetch_alpaca_stock_tickers
 from src.utils.db_utils import get_db_connection
+from config import DB_DIR
 
 # Explicitly define your absolute DB_DIR path
-DB_DIR = Path(r'd:\dev\stat_656_autotrader\databases')
+#DB_DIR = Path(r'd:\dev\stat_656_autotrader\databases')
 DB_DIR.mkdir(exist_ok=True)
 
 DB_PATH = DB_DIR / 'assets.db'
