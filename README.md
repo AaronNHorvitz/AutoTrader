@@ -1,6 +1,6 @@
 # STAT 656 Autotrader
 
-Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project fetches stock tickers from Alpaca, stores them in a SQLite database. The plan is to use ARIMA models, LSTMS's and MCMC methods for stock selection while integrating exogenous data for an automated trader that exectues dail stock trades. 
+Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project fetches stock tickers from Alpaca, stores them in a SQLite database. The plan is to use ARIMA models, LSTMSs and MCMC methods for stock selection while integrating exogenous data for an automated trader that exectues dail stock trades. 
 
 ## Prerequisites
 
@@ -39,6 +39,15 @@ This makes a copy of all the code you will use during this project. While in the
 
 ```
 git clone https://github.com/AaronNHorvitz/stat_656_autotrader.git
+```
+
+***NOTE*** If you’ve already cloned the repository and are setting up your environment again, run one of these commands to update your local copy. Do this every time you start working on your code to stay in sync:
+```
+git pull origin main
+```
+or
+```
+git pull https://github.com/AaronNHorvitz/stat_656_autotrader.git
 ```
 
 #### - E. Set Up the Environment
