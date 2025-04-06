@@ -1,78 +1,104 @@
 # STAT 656 Autotrader
 
-Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project fetches stock and ETF tickers from Alpaca, stores them in a SQLite database, integrates exogenous data (YFinance/FRED), and executes an autotrader (175 stocks OHLC 2002-2025 1-5+ days).
+Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project fetches stock and ETF tickers from Alpaca, stores them in a SQLite database, integrates exogenous data (YFinance/FRED), and executes an autotrader (175 stocks OHLC 2002-2025, 1-5+ days).
 
 ## Prerequisites
 
-- **Python 3.11+**: Installed on your system.
-- **Libraries**: `pandas`, `requests`, `sqlite3` (standard), `alpaca-trade-api` (`pip install alpaca-trade-api`), `yfinance`, `fredapi` (for exogenous data ).
+- **Python 3.11+**: Required for the project.
+- **Git**: For cloning the repository.
+- **Anaconda**: For managing the Python environment and dependencies.
+- **Libraries**: Key dependencies include `pandas`, `requests`, `sqlite3` (standard library), `alpaca-trade-api`, `fredapi`, and more (see `environment.yaml`).
 
 ## Setup
 
-Follow these steps to set up the STAT 656 Autotrader ():
+Follow these steps to set up the STAT 656 Autotrader:
 
 ### Step 1: Install Prerequisites
 
-#### 1. Install Git
+#### - A. Install Git
 - **Windows**: Download from [git-scm.com](https://git-scm.com/download/win).
 - **Mac**: Run `brew install git` ([brew.sh](https://brew.sh)) or download from [git-scm.com](https://git-scm.com/download/mac).
 - **Verify**: `git --version`.
 
-#### 2. Install Anaconda
+#### - B. Install Anaconda
 - **Download**: [Anaconda.com](https://www.anaconda.com/products/distribution).
 - **Install**: Follow the installer instructions.
 - **Verify**: `conda --version`.
 
-#### 3. Set Up the Environment
+#### - C. Open the Anaconda PowerShell Prompt (Windows Users)
+After installing Anaconda on Windows, use the **Anaconda PowerShell Prompt** to run commands. This ensures Conda and Python are accessible:
+- **Start Menu**: Search for "Anaconda PowerShell Prompt" and open it.
+- **Verify Conda**: In the prompt, run:
+  ```powershell
+  conda --version
+  ```
+  You should see something like `conda 23.7.4`. If not, ensure Anaconda was added to your PATH during installation or reinstall it.
 
-Set up Mamba. This will speed up setting up the 'autotrader' enviroment. 
+#### - D. Clone the Repository
+This makes a copy of all the code you will use during this project. While in the Anaconda Powershell, navigate to the directory where you want to store the project's code. This is often a `dev` folder. Type the following into the directory you want to save the code. 
+
 ```
-conda install mamba -c conda-forge
+git clone https://github.com/AaronNHorvitz/stat_656_autotrader.git
 ```
 
-Create Environment: Use environment.yaml to set up dependencies. NOTE: This could take more than an hour to run. 
+#### - E. Set Up the Environment
+Next you will need a copy of all the open source software in an environment that we will all use to code in. This ensures that the versions of the software we are using are the same.  
+There is a PowerShell script named `setup_env.ps1` that simplifies setting up your coding environment. It automatically uses the `environment.yaml` file to install the required library packages and their specific versions. To speed up the setup process, it installs Mamba as a faster alternative to Conda.
+
+##### - 1. Navigate to the Project Directory:
+Type in this and hit enter:
 ```
-mamba env create -f environment.yaml
+cd stat_656_autotrader
+```
+
+##### - 2. Run the Setup Script:
+This script:
+- Installs Mamba if not already present.
+- Removes any existing autotrader environment.
+- Creates a fresh autotrader environment using environment.yaml.
+
+```
+.\setup_env.ps1
+```
+
+##### - 3. Activate the Environment:
+
+```
 conda activate autotrader
 ```
 
-After creating your environment, run the following command to ensure the autotrader environment appears in JupyterLab, Jupyter Notebook, and VS Code:
+##### - 4. Register the Kernel (For Jupyter Lab, Jupyter Notebook, VS Code):
+This registers your environment as a Jupyter kernel, making it selectable in notebook interfaces and IDEs like VS Code.
+
 ```
 python -m ipykernel install --user --name=autotrader --display-name "Python (autotrader)"
 ```
-This registers your environment as a Jupyter kernel and makes it selectable in notebook interfaces and IDEs like VS Code.
-
-#### 4. Clone the Repository
-- **Terminal**: 
-  ```bash
-  git clone https://github.com/YOUR_USERNAME/stat_656_autotrader.git
-  cd stat_656_autotrader
 
 ### Step 2: Get an Alpaca Account
 
 Before you can download tickers, you need an Alpaca account and API keys. Alpaca offers free paper trading ($0)—no real money, just data and trades to play with. Here’s how to set it up:
 
-#### - 1. Sign Up
+#### - A. Sign Up
 - **Visit**: [Alpaca Markets](https://alpaca.markets/)
 - **Action**: Click “Get Started” (top right) or “Sign Up” (center).
 - **Details**: Enter your email and create a password.
 
-#### - 2. Switch to Paper Trading
+#### - B. Switch to Paper Trading
 - **Log In**: Head to [app.alpaca.markets](https://app.alpaca.markets/).
 - **Toggle**: Top left corner—switch from “Live” to “Paper”.
 - Paper trading gives you API access without funding.
 
-#### - 3. Generate API Keys
+#### - C. Generate API Keys
 - **Dashboard**: Scroll to “Your API Keys” (right side).
 - **Click**: “Generate New Keys” (or “View” if already there).
 
-#### - 4. Type the Key and Secret into the .secrets file and save.
+#### - D. Type the Key and Secret into the .secrets file and save.
 - **Create**: Create an empty text file.
 - **Copy**: Grab your **API Key ID** (e.g., `PK123...`) and **Secret Key** (e.g., `abc...xyz`).
 - **Paste**: Paste your credentials in the text file so it looks like this:
 - **Save**: Save your credentials as '.secrets' in the 'credentials' directory.
 
-#### This is how the text should look inside the 'credentials/.secrets' file. 
+#### - E. This is how the text should look inside the 'credentials/.secrets' file. 
   ```
   ALPACA_API_KEY="your_alpaca_key"
   ALPACA_SECRET_KEY="your_alpaca_secret"
@@ -99,7 +125,23 @@ Creating portfolio_management.db...
 Tables in portfolio_management.db created/verified.
 [... repeats for all 6 DBs ...]
 All databases initialized successfully!
-``'
+```
+### Step 4: Running the Tutorials from a Jupyter Notebook
+
+#### - 1. Launching a Jupyter Notebook
+Open the Anaconda PowerShell Prompt, type the following at the prompt, and hit Enter:
+```
+jupyter-notebook
+```
+#### - 2. Navigate to the `Notebooks` directory. 
+In the Jupyter interface, click through to the Notebooks folder.
+
+#### - 3. Open the First Jupyter Notebook Tutorial Labeled `001 Tutorial - Connecting and Testing Alpaca Connections.ipynb` 
+Run the Python code sequentially in each cell to ensure all connections (e.g., Alpaca API) are working.
+
+#### - 4. Open up the second Jupyter Notebook Tutorial labeled `002 Set Up Databases and Populating Tickers and Historical Stock Data.ipynb` 
+Run the Python code sequentially in each cell to populate the database with the most recent tickers and stock prices.
+
 
 ## File Structure/ Project Architecture
 
@@ -174,6 +216,7 @@ stat_656_autotrader/
 |    ├── get_tickers.py        # Fetch asset metadata (Alpaca updated with logging)
 |    └── main.py               # Entry point (runs pipeline)
 |    
+├── setup_env.ps1              # Sets up the `autotrader` environment. 
 ├── setup.py                   # Creates DBs, populates initial metadata
 ├── .gitignore                 # Protects secrets, logs, DBs (e.g., *.db, .secrets)
 ├── environment.yaml           # Anaconda env (dependencies e.g., pandas, yfinance)
