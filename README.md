@@ -165,7 +165,7 @@ stat_656_autotrader/
 |    |
 |    ├── 001 Tutorial - Connecting and Testing Alpaca Connections
 |    ├── 002 Tutorial - Set Up Databases and Populating Tickers and Historical Stock Data
-|    └── 003_Query_and_Visualize_Data.ipynb              
+|    └── 003 Tutorial - Update Recent Stock Prices and Visualize          
 |
 ├── databases/
 |    |
