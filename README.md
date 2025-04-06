@@ -1,6 +1,6 @@
 # STAT 656 Autotrader
 
-Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project fetches stock and ETF tickers from Alpaca, stores them in a SQLite database, integrates exogenous data (YFinance/FRED), and executes an autotrader (175 stocks OHLC 2002-2025, 1-5+ days).
+Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project fetches stock tickers from Alpaca, stores them in a SQLite database. The plan is to use ARIMA models, LSTMS's and MCMC methods for stock selection while integrating exogenous data for an automated trader that exectues dail stock trades. 
 
 ## Prerequisites
 
