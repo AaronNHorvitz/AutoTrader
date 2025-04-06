@@ -154,8 +154,8 @@ stat_656_autotrader/
 |    
 ├── Notebooks/
 |    |
-|    ├── 001_Connecting_to_Alpaca_Tutorial.ipynb   # Demos (e.g., Alpaca API setup)
-|    ├── 002_Create_and_Update_Database.ipynb      
+|    ├── 001 Tutorial - Connecting and Testing Alpaca Connections
+|    ├── 002 Set Up Databases and Populating Tickers and Historical Stock Data
 |    └── 003_Query_and_Visualize_Data.ipynb              
 |
 ├── databases/
