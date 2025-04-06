@@ -23,17 +23,13 @@ Follow these steps to set up the STAT 656 Autotrader ():
 - **Install**: Follow the installer instructions.
 - **Verify**: `conda --version`.
 
-#### 3. Check SQLite
-- **Anaconda**: SQLite is pre-installed. Verify: `sqlite3 --version`.
-- **Install (if needed)**: `conda install -c conda-forge sqlite`.
+#### 3. Set Up the Environment
 
-#### 4. Clone the Repository
-- **Terminal**: 
-  ```bash
-  git clone https://github.com/YOUR_USERNAME/stat_656_autotrader.git
-  cd stat_656_autotrader
+Set up Mamba. This will speed up setting up the 'autotrader' enviroment. 
+```
+conda install mamba -c conda-forge
+```
 
-### Step 2: Set Up the Environment
 Create Environment: Use environment.yaml to set up dependencies. NOTE: This could take more than an hour to run. 
 ```
 conda env create -f environment.yaml
@@ -41,13 +37,18 @@ conda activate autotrader
 ```
 
 After creating your environment, run the following command to ensure the autotrader environment appears in JupyterLab, Jupyter Notebook, and VS Code:
-
 ```
 python -m ipykernel install --user --name=autotrader --display-name "Python (autotrader)"
 ```
 This registers your environment as a Jupyter kernel and makes it selectable in notebook interfaces and IDEs like VS Code.
 
-### Step 3: Get an Alpaca Account
+#### 4. Clone the Repository
+- **Terminal**: 
+  ```bash
+  git clone https://github.com/YOUR_USERNAME/stat_656_autotrader.git
+  cd stat_656_autotrader
+
+### Step 2: Get an Alpaca Account
 
 Before you can download tickers, you need an Alpaca account and API keys. Alpaca offers free paper trading ($0)—no real money, just data and trades to play with. Here’s how to set it up:
 
@@ -77,8 +78,7 @@ Before you can download tickers, you need an Alpaca account and API keys. Alpaca
   ALPACA_SECRET_KEY="your_alpaca_secret"
   ALPAKA_ENDPOINT_URL=""
   ```
-
-### Step 4: Run 'setup.py' to Initialize and Populate the Databases
+### Step 3: Run 'setup.py' to Initialize and Populate the Databases
 
 Run the setup.py script to check and create the SQLite databases (6 .db files: assets.db, portfolio_management.db, accounting.db, modeling.db, exogenous.db, db_change_log.db):
 
@@ -99,8 +99,7 @@ Creating portfolio_management.db...
 Tables in portfolio_management.db created/verified.
 [... repeats for all 6 DBs ...]
 All databases initialized successfully!
-```
-
+``'
 
 ## File Structure/ Project Architecture
 
@@ -127,8 +126,7 @@ stat_656_autotrader/
 |    └── db_change_log.db      # Audit trail 
 |    |
 ├── logs/                      # Log files
-|    ├── setup.log             # Setup run logs
-|    └── fetch.log             # New 
+|    └──  setup.log             # Setup run logs
 | 
 ├── credentials/
 |    └── .secrets              # API keys 
