@@ -220,7 +220,6 @@ stat_656_autotrader/
 │    │   ├── db_utils.py
 |    |   └── <add files as needed> 
 |    |
-|    ├── config.py             # Settings (BASE_URL, DB paths, API endpoints)
 |    ├── db_schema.py          # Database schema used during initial setup. 
 |    ├── get_tickers.py        # Fetch asset metadata (Alpaca updated with logging)
 |    └── main.py               # Entry point (runs pipeline)
@@ -228,6 +227,7 @@ stat_656_autotrader/
 ├── setup_env.ps1              # Sets up the `autotrader` environment. 
 ├── setup.py                   # Creates DBs, populates initial metadata
 ├── .gitignore                 # Protects secrets, logs, DBs (e.g., *.db, .secrets)
+├── config.py                  # Settings (BASE_URL, DB paths, API endpoints)
 ├── environment.yaml           # Anaconda env (dependencies e.g., pandas, yfinance)
 └── README.md                  # Project overview (this file)
 ```
