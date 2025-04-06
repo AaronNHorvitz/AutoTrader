@@ -32,7 +32,7 @@ conda install mamba -c conda-forge
 
 Create Environment: Use environment.yaml to set up dependencies. NOTE: This could take more than an hour to run. 
 ```
-conda env create -f environment.yaml
+mamba env create -f environment.yaml
 conda activate autotrader
 ```
 
