@@ -2,6 +2,7 @@
 import sqlite3
 import pandas as pd
 from pathlib import Path
+from datetime import datetime
 from src.config import DB_DIR
 
 def get_db_connection(db_name='assets.db', print_statements=True):
