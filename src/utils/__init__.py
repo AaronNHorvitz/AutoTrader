@@ -18,7 +18,9 @@ from .db_utils import (
     fetch_active_tickers,
     get_latest_price_date,
     fetch_all_asset_metadata,  
-    fetch_all_asset_prices    
+    fetch_all_asset_prices, 
+    last_data_date, 
+    last_fetch_date
 )
 
 __all__ = [
@@ -34,5 +36,7 @@ __all__ = [
     'fetch_active_tickers',
     'get_latest_price_date',
     'fetch_all_asset_metadata',  
-    'fetch_all_asset_prices'     
+    'fetch_all_asset_prices', 
+    'last_data_date', 
+    'last_fetch_date'
 ]

@@ -1,5 +1,15 @@
 # src/__init__.py
 
+
+
+from .etl import (
+    populate_prices, 
+    ensure_prices_table, 
+    populate_tickers,
+    recreate_database,
+    update_daily_prices,
+)
+
 from .utils import (
     get_alpaca_client,
     fetch_alpaca_stock_tickers,
@@ -8,14 +18,8 @@ from .utils import (
     get_db_connection,
     fetch_active_tickers,
     get_latest_price_date,
-)
-
-from .etl import (
-    populate_prices, 
-    ensure_prices_table, 
-    populate_tickers,
-    recreate_database,
-    update_daily_prices,
+    last_data_date, 
+    last_fetch_date
 )
 
 from .statistics import (
@@ -47,5 +51,7 @@ __all__ = [
     'recreate_database',
     'update_daily_prices',
     'smooth_lowess',
-    'plot_stock_trends'
+    'plot_stock_trends',
+    'last_data_date',
+    'last_fetch_date',
 ]
