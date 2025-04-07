@@ -167,3 +167,36 @@ def last_fetch_date(print_statements=False):
     
     return date_only
 
+def fetch_database_stock_tickers():
+    """Retrieve a list of stock ticker symbols from the asset_metadata table.
+
+    This function queries the SQLite database 'assets.db' to extract all values
+    from the 'symbol' column in the 'asset_metadata' table and returns them as
+    a Python list.
+
+    Returns
+    -------
+    list
+        A list of strings representing stock ticker symbols (e.g., ['AAPL', 'GOOGL', 'TSLA']).
+
+    Raises
+    ------
+    sqlite3.Error
+        If there is an issue with the database connection or query execution.
+    KeyError
+        If the 'symbol' column is not present in the query result.
+
+    Examples
+    --------
+    >>> from db_utils import fetch_database_stock_tickers
+    >>> tickers = fetch_database_stock_tickers()
+    >>> print(tickers)
+    ['AAPL', 'GOOGL', 'TSLA']
+    """
+    conn = get_db_connection('assets.db', print_statements=False)
+    query = """
+    SELECT symbol FROM asset_metadata
+    """
+    past_ticker_list = pd.read_sql(query, conn)['symbol'].to_list()
+    conn.close()
+    return past_ticker_list

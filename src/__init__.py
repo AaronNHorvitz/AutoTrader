@@ -19,8 +19,9 @@ from .utils import (
     fetch_active_tickers,
     get_latest_price_date,
     last_data_date, 
-    last_fetch_date
-)
+    last_fetch_date,
+    fetch_database_stock_tickers
+    )
 
 from .statistics import (
     smooth_lowess,
@@ -54,4 +55,5 @@ __all__ = [
     'plot_stock_trends',
     'last_data_date',
     'last_fetch_date',
+    'fetch_database_stock_tickers',
 ]
