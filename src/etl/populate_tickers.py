@@ -44,7 +44,7 @@ def populate_tickers():
     date_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     for asset in assets:
-        if asset.exchange in ['NASDAQ', 'NYSE', 'AMEX', 'OTC'] and asset.tradable and asset.symbol.isalpha():
+        if asset.exchange in ['NASDAQ', 'NYSE', 'AMEX'] and asset.tradable and asset.symbol.isalpha():
             query_string = """
                 INSERT OR IGNORE INTO asset_metadata (
                     symbol, name, exchange, asset_type, is_active, date_added, fetched_at
