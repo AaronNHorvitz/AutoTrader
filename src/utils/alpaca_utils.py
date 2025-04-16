@@ -11,9 +11,9 @@ from src.utils.db_utils import get_db_connection, fetch_active_tickers
 def get_alpaca_client():
     return REST(ALPACA_API_KEY, ALPACA_SECRET_KEY, base_url=ALPAKA_ENDPOINT_URL)
 
-def connect_to_alpaca(api_key, secret_key, base_url):
+def connect_to_alpaca(ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPAKA_ENDPOINT_URL):
     try:
-        return REST(api_key, secret_key, base_url=base_url)
+        return REST(ALPACA_API_KEY, ALPACA_SECRET_KEY, base_url=ALPAKA_ENDPOINT_URL)
     except Exception as e:
         print(f"Connection failed: {e}")
         return None
@@ -144,6 +144,63 @@ def fetch_alpaca_latest_bars(alpaca_client, tickers):
     except Exception as e:
         print(f"Error fetching latest bars: {e}")
         return pd.DataFrame()
+
+
+import pandas as pd
+import time
+from tqdm import tqdm
+from datetime import datetime
+
+def populate_alpaca_full_price_history(alpaca_client, tickers, end_date=None):
+    """
+    Populate full historical OHLC data from Alpaca for a list of tickers,
+    fetching data as far back as possible until the specified end date.
+
+    Args:
+        alpaca_client (REST): Initialized Alpaca REST client.
+        tickers (list): List of stock tickers to fetch.
+        end_date (str, optional): End date in 'YYYY-MM-DD' format. Defaults to today's date.
+
+    Returns:
+        pd.DataFrame: Combined OHLC data for all tickers.
+    """
+    if end_date is None:
+        end_date = datetime.today().strftime('%Y-%m-%d')
+
+    alpaca_df = pd.DataFrame()
+    start_time = time.time()
+    missing_data_count = 0
+    processed_ticker_count = 0
+
+    for ticker in tqdm(tickers, desc="Alpaca Download Progress"):
+        try:
+            processed_ticker_count += 1
+            bars = alpaca_client.get_bars(ticker, "1Day", "1900-01-01", end_date).df
+
+            if not bars.empty:
+                df = bars[['open', 'high', 'low', 'close']].reset_index()
+                df['ticker'] = ticker
+                df['date'] = df['timestamp'].dt.strftime("%Y-%m-%d")
+                df = df[['ticker', 'date', 'open', 'high', 'low', 'close']]
+                alpaca_df = pd.concat([alpaca_df, df], ignore_index=True)
+            else:
+                missing_data_count += 1
+
+            time.sleep(1)  # Avoid rate limiting
+            
+        except Exception as e:
+            print(f"Error for {ticker}: {e}")
+            missing_data_count += 1
+            time.sleep(1)
+
+    total_seconds = time.time() - start_time
+    seconds_per_ticker = round(total_seconds / len(tickers), 2)
+    print(f"\nFetched {len(alpaca_df)} rows of stock data in {total_seconds:.2f} seconds.")
+    print(f"Processed {processed_ticker_count} tickers, missing data for {missing_data_count} tickers.")
+    print(f"Processing time per ticker: {seconds_per_ticker:.2f} seconds.")
+    return alpaca_df
+
+
 
 def update_stock_prices(db_path="assets.db"):
     """

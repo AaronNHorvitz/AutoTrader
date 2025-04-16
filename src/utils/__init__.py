@@ -1,3 +1,4 @@
+#src/utils/__init__.py
 """
 Utilities module initialization for stat_656_autotrader.
 """
@@ -10,7 +11,8 @@ from .alpaca_utils import (
     fetch_alpaca_yesterday_ohlc,
     fetch_alpaca_open_prices,
     fetch_alpaca_latest_bars,
-    update_stock_prices
+    update_stock_prices,
+    populate_alpaca_full_price_history
 )
 
 from .db_utils import (
@@ -20,7 +22,8 @@ from .db_utils import (
     fetch_all_asset_metadata,  
     fetch_all_asset_prices, 
     last_data_date, 
-    last_fetch_date
+    last_fetch_date,
+    fetch_database_stock_tickers
 )
 
 __all__ = [
@@ -38,5 +41,7 @@ __all__ = [
     'fetch_all_asset_metadata',  
     'fetch_all_asset_prices', 
     'last_data_date', 
-    'last_fetch_date'
+    'last_fetch_date',
+    'fetch_database_stock_tickers',
+    'populate_alpaca_full_price_history'
 ]

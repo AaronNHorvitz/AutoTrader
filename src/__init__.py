@@ -1,7 +1,5 @@
 # src/__init__.py
 
-
-
 from .etl import (
     populate_prices, 
     ensure_prices_table, 
@@ -20,7 +18,8 @@ from .utils import (
     get_latest_price_date,
     last_data_date, 
     last_fetch_date,
-    fetch_database_stock_tickers
+    fetch_database_stock_tickers,
+    populate_alpaca_full_price_history
     )
 
 from .statistics import (
@@ -56,4 +55,5 @@ __all__ = [
     'last_data_date',
     'last_fetch_date',
     'fetch_database_stock_tickers',
+    'populate_alpaca_full_price_history'
 ]
