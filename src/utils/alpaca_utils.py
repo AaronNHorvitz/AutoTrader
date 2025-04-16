@@ -1,8 +1,8 @@
 # src/utils/alpaca_utils.py
-
+import pandas as pd
 import time
 from datetime import datetime, timedelta
-import pandas as pd
+
 from tqdm import tqdm
 from alpaca_trade_api.rest import REST
 from credentials import ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPAKA_ENDPOINT_URL
@@ -145,63 +145,6 @@ def fetch_alpaca_latest_bars(alpaca_client, tickers):
         print(f"Error fetching latest bars: {e}")
         return pd.DataFrame()
 
-
-import pandas as pd
-import time
-from tqdm import tqdm
-from datetime import datetime
-
-def populate_alpaca_full_price_history(alpaca_client, tickers, end_date=None):
-    """
-    Populate full historical OHLC data from Alpaca for a list of tickers,
-    fetching data as far back as possible until the specified end date.
-
-    Args:
-        alpaca_client (REST): Initialized Alpaca REST client.
-        tickers (list): List of stock tickers to fetch.
-        end_date (str, optional): End date in 'YYYY-MM-DD' format. Defaults to today's date.
-
-    Returns:
-        pd.DataFrame: Combined OHLC data for all tickers.
-    """
-    if end_date is None:
-        end_date = datetime.today().strftime('%Y-%m-%d')
-
-    alpaca_df = pd.DataFrame()
-    start_time = time.time()
-    missing_data_count = 0
-    processed_ticker_count = 0
-
-    for ticker in tqdm(tickers, desc="Alpaca Download Progress"):
-        try:
-            processed_ticker_count += 1
-            bars = alpaca_client.get_bars(ticker, "1Day", "1900-01-01", end_date).df
-
-            if not bars.empty:
-                df = bars[['open', 'high', 'low', 'close']].reset_index()
-                df['ticker'] = ticker
-                df['date'] = df['timestamp'].dt.strftime("%Y-%m-%d")
-                df = df[['ticker', 'date', 'open', 'high', 'low', 'close']]
-                alpaca_df = pd.concat([alpaca_df, df], ignore_index=True)
-            else:
-                missing_data_count += 1
-
-            time.sleep(1)  # Avoid rate limiting
-            
-        except Exception as e:
-            print(f"Error for {ticker}: {e}")
-            missing_data_count += 1
-            time.sleep(1)
-
-    total_seconds = time.time() - start_time
-    seconds_per_ticker = round(total_seconds / len(tickers), 2)
-    print(f"\nFetched {len(alpaca_df)} rows of stock data in {total_seconds:.2f} seconds.")
-    print(f"Processed {processed_ticker_count} tickers, missing data for {missing_data_count} tickers.")
-    print(f"Processing time per ticker: {seconds_per_ticker:.2f} seconds.")
-    return alpaca_df
-
-
-
 def update_stock_prices(db_path="assets.db"):
     """
     Queries the database for the last stock fetch and update times, then updates with latest prices.
@@ -293,6 +236,94 @@ def update_stock_prices(db_path="assets.db"):
         print(result["status"])
     
     return result
+
+def ensure_prices_table():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS asset_prices (
+            price_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            asset_id INTEGER,
+            date TEXT,
+            open REAL,
+            high REAL,
+            low REAL,
+            close REAL,
+            adjusted_close REAL,
+            volume INTEGER,
+            fetched_at TEXT,
+            FOREIGN KEY(asset_id) REFERENCES asset_metadata(asset_id)
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+def populate_alpaca_full_history(alpaca_client, tickers, end_date=None):
+    """
+    Populate full historical OHLC data from Alpaca for a list of tickers,
+    fetching data as far back as possible until the specified end date,
+    and inserting each record directly into the database.
+
+    Args:
+        alpaca_client (REST): Initialized Alpaca REST client.
+        tickers (list): List of stock tickers to fetch.
+        end_date (str, optional): End date in 'YYYY-MM-DD' format. Defaults to today's date.
+    """
+    if end_date is None:
+        end_date = datetime.today().strftime('%Y-%m-%d')
+
+    start_time = time.time()
+    missing_data_count = 0
+    processed_ticker_count = 0
+    tickers_dict = fetch_active_tickers()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Ensure the asset_prices table exists using the locally defined function
+    ensure_prices_table()
+
+    for ticker in tqdm(tickers, desc="Alpaca Download Progress"):
+        try:
+            processed_ticker_count += 1
+            bars = alpaca_client.get_bars(ticker, "1Day", "1900-01-01", end_date, feed='iex').df
+
+            if not bars.empty:
+                df = bars[['open', 'high', 'low', 'close']].reset_index()
+                df['ticker'] = ticker
+                df['date'] = df['timestamp'].dt.strftime("%Y-%m-%d")
+                df = df[['ticker', 'date', 'open', 'high', 'low', 'close']]
+
+                asset_id = tickers_dict.get(ticker)
+                if asset_id:
+                    for _, row in df.iterrows():
+                        cursor.execute("""
+                            INSERT OR IGNORE INTO asset_prices (asset_id, date, open, high, low, close, fetched_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """, (
+                            asset_id,
+                            row['date'],
+                            row['open'],
+                            row['high'],
+                            row['low'],
+                            row['close'],
+                            datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        ))
+            else:
+                missing_data_count += 1
+
+            conn.commit()
+            time.sleep(1)  # Avoid rate limiting
+
+        except Exception as e:
+            print(f"Error for {ticker}: {e}")
+            missing_data_count += 1
+            time.sleep(1)
+
+    conn.close()
+    total_seconds = time.time() - start_time
+    seconds_per_ticker = round(total_seconds / len(tickers), 2)
+    print(f"\nProcessed {processed_ticker_count} tickers, missing data for {missing_data_count} tickers.")
+    print(f"Total time: {total_seconds:.2f} seconds. Avg time per ticker: {seconds_per_ticker:.2f} seconds.")
 
 # Example usage
 if __name__ == "__main__":

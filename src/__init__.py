@@ -2,7 +2,6 @@
 
 from .etl import (
     populate_prices, 
-    ensure_prices_table, 
     populate_tickers,
     recreate_database,
     update_daily_prices,
@@ -19,7 +18,7 @@ from .utils import (
     last_data_date, 
     last_fetch_date,
     fetch_database_stock_tickers,
-    populate_alpaca_full_price_history
+    populate_alpaca_full_history,
     )
 
 from .statistics import (
@@ -46,7 +45,6 @@ __all__ = [
     'fetch_active_tickers',
     'get_latest_price_date',
     'populate_prices',
-    'ensure_prices_table',
     'populate_tickers',
     'recreate_database',
     'update_daily_prices',
@@ -55,5 +53,6 @@ __all__ = [
     'last_data_date',
     'last_fetch_date',
     'fetch_database_stock_tickers',
-    'populate_alpaca_full_price_history'
+    'fetch_alpaca_full_price_history',
+    'populate_alpaca_full_history',
 ]

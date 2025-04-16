@@ -12,7 +12,7 @@ from .alpaca_utils import (
     fetch_alpaca_open_prices,
     fetch_alpaca_latest_bars,
     update_stock_prices,
-    populate_alpaca_full_price_history
+    populate_alpaca_full_history
 )
 
 from .db_utils import (
@@ -23,7 +23,7 @@ from .db_utils import (
     fetch_all_asset_prices, 
     last_data_date, 
     last_fetch_date,
-    fetch_database_stock_tickers
+    fetch_database_stock_tickers,
 )
 
 __all__ = [
@@ -43,5 +43,5 @@ __all__ = [
     'last_data_date', 
     'last_fetch_date',
     'fetch_database_stock_tickers',
-    'populate_alpaca_full_price_history'
+    'populate_alpaca_full_history',
 ]
