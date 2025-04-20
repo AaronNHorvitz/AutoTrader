@@ -1,0 +1,160 @@
+import sys
+from pathlib import Path
+from datetime import datetime, timedelta
+
+from src.utils import get_alpaca_client, fetch_alpaca_stock_tickers, fetch_alpaca_historical_data, fetch_alpaca_latest_bars
+from credentials import ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPAKA_ENDPOINT_URL
+
+# Initialize Alpaca client
+alpaca = get_alpaca_client()
+
+sys.path.append(r"d:\dev\stat_656_autotrader")
+
+from src.db_schema import DATABASES
+from src.etl.populate_tickers import recreate_database, populate_tickers
+from src.etl.populate_prices import ensure_prices_table, populate_prices
+from src.utils.db_utils import fetch_all_asset_metadata, fetch_all_asset_prices
+
+class MCMCParameters:
+    momentum_threshold: float = 0.20  # 20% upward momentum threshold
+    n_simulations: int = 10000
+    confidence_level: float = 0.95
+    burn_in_period: int = 2000
+    thinning_factor: int = 5
+    
+    def initialize_parameters(self) -> Dict:
+        """Initialize MCMC parameters for each stock"""
+        return {
+            'mu': np.random.normal(0, 0.1),
+            'sigma': np.random.uniform(0.01, 0.1),
+            'momentum': np.random.uniform(0, 0.5)
+        }
+    
+    def calculate_momentum(self, prices: pd.Series) -> float:
+        """Calculate momentum score for a stock"""
+        returns = prices.pct_change().dropna()
+        momentum = returns.rolling(window=20).mean().iloc[-1]
+        return momentum
+
+class StockMCMC:
+    def __init__(self, params: MCMCParameters):
+        self.params = params
+        self.stock_data = {}
+        
+    def initialize_chain(self, stock_data: Dict[str, pd.Series]) -> None:
+        """Initialize MCMC chain for all stocks"""
+        self.stock_data = stock_data
+        self.chains = {}
+        for symbol, prices in stock_data.items():
+            self.chains[symbol] = self.params.initialize_parameters()
+    
+    def calculate_log_posterior(self, symbol: str, params: Dict) -> float:
+        """Calculate log posterior probability for a stock"""
+        prices = self.stock_data[symbol]
+        momentum = self.calculate_momentum(prices)
+        
+        # Prior distribution
+        log_prior = np.log(np.random.beta(2, 5))  # Weak prior for momentum
+        
+        # Likelihood
+        log_likelihood = np.sum(
+            np.log(self._likelihood(params['mu'], params['sigma'], prices))
+        )
+        
+        return log_prior + log_likelihood
+    
+    def _likelihood(self, mu: float, sigma: float, prices: pd.Series) -> np.ndarray:
+        """Calculate likelihood for normal distribution"""
+        returns = prices.pct_change().dropna()
+        return np.exp(-0.5 * ((returns - mu) / sigma) ** 2) / (sigma * np.sqrt(2 * np.pi))
+    
+    def sample(self, symbol: str) -> Dict:
+        """Perform one MCMC step for a stock"""
+        current_params = self.chains[symbol]
+        proposed_params = self._propose_parameters(current_params)
+        
+        current_log_posterior = self.calculate_log_posterior(symbol, current_params)
+        proposed_log_posterior = self.calculate_log_posterior(symbol, proposed_params)
+        
+        log_alpha = proposed_log_posterior - current_log_posterior
+        if np.log(np.random.random()) < log_alpha:
+            self.chains[symbol] = proposed_params
+            
+        return self.chains[symbol]
+    
+    def _propose_parameters(self, current_params: Dict) -> Dict:
+        """Propose new parameters using random walk"""
+        proposed = current_params.copy()
+        proposed['mu'] += np.random.normal(0, 0.01)
+        proposed['sigma'] += np.random.uniform(-0.001, 0.001)
+        proposed['momentum'] += np.random.uniform(-0.01, 0.01)
+        return proposed
+    
+    def run_chain(self, symbol: str) -> List[Dict]:
+        """Run MCMC chain for a single stock"""
+        chain = []
+        for _ in range(self.params.n_simulations):
+            params = self.sample(symbol)
+            if _ > self.params.burn_in_period and _ % self.params.thinning_factor == 0:
+                chain.append(params)
+        return chain
+
+class StockAnalyzer:
+    def __init__(self, mcmc: StockMCMC):
+        self.mcmc = mcmc
+        self.top_stocks = []
+    
+    def analyze_stocks(self) -> List[Tuple[str, float]]:
+        """Analyze all stocks and return top momentum stocks"""
+        results = []
+        for symbol in self.mcmc.stock_data.keys():
+            chain = self.mcmc.run_chain(symbol)
+            momentum_scores = [params['momentum'] for params in chain]
+            avg_momentum = np.mean(momentum_scores)
+            if avg_momentum >= self.mcmc.params.momentum_threshold:
+                results.append((symbol, avg_momentum))
+        
+        self.top_stocks = sorted(results, key=lambda x: x[1], reverse=True)[:20]
+        return self.top_stocks
+    
+    def get_momentum_scores(self) -> pd.DataFrame:
+        """Return momentum scores as a DataFrame"""
+        scores = []
+        for symbol, momentum in self.top_stocks:
+            scores.append({
+                'symbol': symbol,
+                'momentum_score': momentum,
+                'confidence_interval': self._calculate_confidence_interval(symbol)
+            })
+        return pd.DataFrame(scores)
+    
+    def _calculate_confidence_interval(self, symbol: str) -> Tuple[float, float]:
+        """Calculate confidence interval for a stock's momentum"""
+        chain = self.mcmc.run_chain(symbol)
+        momentum_scores = [params['momentum'] for params in chain]
+        ci = np.percentile(momentum_scores, 
+                          [(1 - self.mcmc.params.confidence_level)/2 * 100, 
+                           (1 + self.mcmc.params.confidence_level)/2 * 100])
+        return tuple(ci)
+
+def main():
+    # Initialize components
+    params = MCMCParameters()
+    mcmc = StockMCMC(params)
+    analyzer = StockAnalyzer(mcmc)
+    
+    # Fetch and prepare data
+    tickers = fetch_alpaca_stock_tickers()
+    stock_data = fetch_alpaca_historical_data(tickers)
+    
+    # Run analysis
+    mcmc.initialize_chain(stock_data)
+    top_stocks = analyzer.analyze_stocks()
+    
+    # Get results
+    results_df = analyzer.get_momentum_scores()
+    print("\nTop 20 Stocks with Momentum Scores:")
+    print(results_df)
+
+if __name__ == "__main__":
+    main()
