@@ -59,7 +59,7 @@ Historical Price Data
           │
 Data Preprocessing (Screen Stocks for 100 Days of Pricing Data)
           │
-Detect Level Shifts/ Structural Breaks (Screen Stocks for a 100 Days of Pricing Data After Structural Breaks)\
+Detect Level Shifts/ Structural Breaks (Screen Stocks for a 100 Days of Pricing Data After Structural Breaks)
           │
 Log-transform & First-Difference (Check Stationarity)
           │
@@ -237,9 +237,12 @@ stat_656_autotrader/
 |    
 ├── Notebooks/
 |    |
-|    ├── 001 Tutorial - Connecting and Testing Alpaca Connections
-|    ├── 002 Tutorial - Set Up Databases and Populating Tickers and Historical Stock Data
-|    └── 003 Tutorial - Update Recent Stock Prices and Visualize          
+|    ├── 001 Tutorial - Connecting and Testing Alpaca Connections.ipynb
+|    ├── 002 Tutorial - Set Up Databases and Populating Tickers and Historical Stock Data.ipynb
+|    ├── 003 Tutorial - Update Recent Stock Prices and Visualize.ipynb   
+|    ├── 004 Tutorial - Simple Database Queries.ipynb 
+|    ├── 005 Tutorial - Tests for Randomness.ipynb
+|    └── <add notebooks as needed>             
 |
 ├── databases/
 |    |
@@ -254,14 +257,26 @@ stat_656_autotrader/
 |    └──  setup.log             # Setup run logs
 | 
 ├── credentials/
+│    ├── __init__.py
 |    └── .secrets              # API keys 
 |    
 ├── src/
 |    |
 |    ├── models/
 |    |   |
+│    │   ├── __init__.py
+|    |   |   |
 |    |   ├── forecasting/      # Prediction logic 
-|    |   └── trading/          # Trading logic 
+|    |   |   |
+|    |   |   ├── __init__.py   
+|    |   |   └── <add files as needed>
+|    |   |    
+|    |   ├── trading/          # Trading logic
+|    |   |   |
+|    |   |   ├── __init__.py   
+|    |   |   └── <add files as needed>  
+|    |   |
+|    |   └── <add directories as needed>    
 |    |
 |    ├── etl/
 |    |   |
@@ -272,19 +287,32 @@ stat_656_autotrader/
 |    |   └── <add files as needed>      
 |    |
 |    ├── statistics/
-|    |   └── smoothers.py  
+|    |   |
+│    │   ├── __init__.py
+│    │   ├── transformations.py
+|    |   ├── smoothers.py  
+|    |   └── <add files as needed>  
 |    |
 |    ├── execution/            # Trade execution 
+│    │   ├── __init__.py
+|    |   └── <add files as needed> 
 |    |
-|    ├── visulazations/       
+|    ├── visulazations/ 
+|    |   |      
+│    │   ├── __init__.py
 |    |   ├── stock_price_trends.py  
 |    |   └── <add files as needed>      
 |    |
 |    ├── dashboard/            # Dashboard logic (e.g., Flask/Dash)
+|    |   |
+│    │   ├── __init__.py
 |    |   └── <add files as needed>  
 |    | 
 |    ├── tests/                # Unit tests 
-|    |   └── test_smoothers.py # Test statitical smoothing methods. 
+|    |   |
+│    │   ├── test_transformations.py
+│    │   ├── test_smoothers.py # Test statitical smoothing methods. 
+|    |   └── <add files as needed> 
 |    |
 |    ├── utils/                
 │    │   ├── __init__.py
