@@ -7,7 +7,9 @@ from src.models.forecasting.arimax import (
     select_best_arimax,
     forecast_arimax,
     prepare_data_and_fit_arimax,
-)
+    prepare_and_validate_data,
+    fit_and_forecast_next_day
+    )
 
 # Test selecting the best ARIMAX model with sufficient data.
 def test_select_best_arimax():
@@ -119,6 +121,36 @@ def test_arimax_with_extreme_outliers():
             f"Model fitting unexpectedly raised an exception with outliers: {e}"
         )
 
+# Test the complete pipeline of preparing data, fitting ARIMAX, and forecasting.
+def test_prepare_and_validate_data():
+    ticker = 'AAPL'
+    try:
+        df = prepare_and_validate_data(ticker, days_back=150)
+    except Exception as e:
+        pytest.fail(f"prepare_and_validate_data raised an unexpected exception: {e}")
+
+    expected_columns = ['open_logdiff', 'high_logdiff', 'low_logdiff', 'close_logdiff']
+    for col in expected_columns:
+        assert col in df.columns, f"{col} missing in prepared DataFrame."
+
+    assert not df.empty, "Prepared DataFrame should not be empty."
+
+# Test fitting and forecasting for the next day.
+def test_fit_and_forecast_next_day():
+    ticker = 'AAPL'
+    df = prepare_and_validate_data(ticker, days_back=150)
+
+    next_open_price = df['open'].iloc[-1] * 1.01  # Assume small increase for testing
+    forecast_df = fit_and_forecast_next_day(df, 'close', 'open', next_open_price)
+
+    for col in ["forecast", "lower_ci", "upper_ci"]:
+        assert col in forecast_df.columns, f"{col} missing from forecast output."
+
+    assert len(forecast_df) == 1, "Forecast DataFrame should contain exactly one row."
+    assert forecast_df["lower_ci"].iloc[0] <= forecast_df["forecast"].iloc[0] <= forecast_df["upper_ci"].iloc[0], \
+        "Forecasted value not within prediction interval."
+
+
 
 if __name__ == "__main__":
     test_select_best_arimax()
@@ -129,5 +161,7 @@ if __name__ == "__main__":
     test_forecast_arimax()
     test_forecast_with_invalid_exog()
     test_arimax_with_extreme_outliers()
+    test_prepare_and_validate_data()
+    test_fit_and_forecast_next_day
 
     print("✅ All ARIMAX robustness tests passed successfully!")
