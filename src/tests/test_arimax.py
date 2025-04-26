@@ -130,4 +130,4 @@ if __name__ == "__main__":
     test_forecast_with_invalid_exog()
     test_arimax_with_extreme_outliers()
 
-    print("All ARIMAX robustness tests passed.")
+    print("✅ All ARIMAX robustness tests passed successfully!")
