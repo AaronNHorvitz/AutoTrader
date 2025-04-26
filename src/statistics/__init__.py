@@ -8,14 +8,27 @@ from .smoothers import (
     exponential_smoother, 
     lowess_ci_pi, 
     exp_smooth_ci_pi,
-    sma_smoother
+    sma_smoother,
     )
+
+from .transformations import (
+    check_positive, 
+    log_transform,
+    difference,
+    log_difference
+    )
+
+
 
 __all__ = [
     'smooth_lowess',
     'exponential_smoother',
     'lowess_ci_pi',
     'exp_smooth_ci_pi',
-    'sma_smoother'
+    'sma_smoother',
+    'check_positive',
+    'log_transform',
+    'difference',
+    'log_difference'
     ]
 
