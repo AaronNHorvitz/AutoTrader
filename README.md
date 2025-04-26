@@ -20,11 +20,13 @@ The Autotrader implements a systematic trading approach combining:
 - Fetch historical price data (~150 trading days) via the Alpaca API.
 - Store data efficiently in SQLite databases (`assets.db`, `exogenous.db`, etc.).
 
-### 2. Data Preprocessing and Stationarity Testing
+### 2. Data Preprocessing and Stationarity / Structural Break Testing
 
+- Check for 100 days worth of pricing data
 - Perform **log-transformation** and **first-order differencing** on price series.
-- Validate stationarity explicitly with the **Augmented Dickey-Fuller (ADF)** test.
-- If non-stationary, apply second differencing. Temporarily exclude stocks that fail stationarity or exhibit recent structural breaks (<100 stable data points).
+- Identify Structural Breaks structural breaks - 100 days worth of trading data after a level shift / change point using **CUSUM test**, **Pettitt's test**, **Rolling window variance/ mean shift detection**
+- Validate stationarity explicitly with the **Augmented Dickey-Fuller (ADF)** test. 
+- Temporarily exclude stocks that fail stationarity or exhibit recent structural breaks (<100 stable data points).
 
 ### 3. ARIMAX Forecasting
 
@@ -54,6 +56,10 @@ The Autotrader implements a systematic trading approach combining:
 
 ```
 Historical Price Data
+          │
+Data Preprocessing (Screen for 100 Days of Pricing Data)
+          │
+Identify Structural Breaks (Screen for a 100 Days of Pricing Data After Structural Breaks)\
           │
 Log-transform & First-Difference (Check Stationarity)
           │
