@@ -18,6 +18,12 @@ from .transformations import (
     log_difference
     )
 
+from .stationarity import (
+    adf_test,
+    adfuller, 
+    kpss_test,
+    check_stationarity,
+)
 
 
 __all__ = [
@@ -29,6 +35,10 @@ __all__ = [
     'check_positive',
     'log_transform',
     'difference',
-    'log_difference'
+    'log_difference',
+    'adf_test',
+    'adfuller',
+    'kpss_test',
+    'check_stationarity',
     ]
 
