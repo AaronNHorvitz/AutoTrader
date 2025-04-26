@@ -239,9 +239,10 @@ stat_656_autotrader/
 |    |
 |    ├── 001 Tutorial - Connecting and Testing Alpaca Connections.ipynb
 |    ├── 002 Tutorial - Set Up Databases and Populating Tickers and Historical Stock Data.ipynb
-|    ├── 003 Tutorial - Update Recent Stock Prices and Visualize.ipynb   
-|    ├── 004 Tutorial - Simple Database Queries.ipynb 
-|    ├── 005 Tutorial - Tests for Randomness.ipynb
+|    ├── 003 Tutorial - Update Recent Stock Prices and Visualize.ipynb  
+|    ├── 004 Tutorial - Visualize Stock Data.ipynb  
+|    ├── 005 Tutorial - Simple Database Queries.ipynb 
+|    ├── 006 Tutorial - Tests for Randomness.ipynb
 |    └── <add notebooks as needed>             
 |
 ├── databases/
