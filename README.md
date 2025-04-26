@@ -252,7 +252,7 @@ stat_656_autotrader/
 |    ├── modeling.db           # Model & actual forecasts 
 |    ├── exogenous.db          # Exogenous metadata & values
 |    └── db_change_log.db      # Audit trail 
-|    |
+|    
 ├── logs/                      # Log files
 |    └──  setup.log             # Setup run logs
 | 
@@ -289,8 +289,10 @@ stat_656_autotrader/
 |    ├── statistics/
 |    |   |
 │    │   ├── __init__.py
-│    │   ├── transformations.py
-|    |   ├── smoothers.py  
+│    │   ├── changepoints.py       # Level shifts, variance shifts, trend changes, etc. 
+|    |   ├── smoothers.py          # Smoothing utilities (Exponential, Simple Moving Average, LOWESS, etc.)
+|    |   ├── stationarity.py       # Stationarity tests (ADF, KPSS, etc.)  
+│    │   ├── transformations.py    # Differencing, log transforms
 |    |   └── <add files as needed>  
 |    |
 |    ├── execution/            # Trade execution 
@@ -310,8 +312,10 @@ stat_656_autotrader/
 |    | 
 |    ├── tests/                # Unit tests 
 |    |   |
+│    │   ├── test_changepoints.py
+│    │   ├── test_smoothers.py 
+│    │   ├── test_stationarity.py 
 │    │   ├── test_transformations.py
-│    │   ├── test_smoothers.py # Test statitical smoothing methods. 
 |    |   └── <add files as needed> 
 |    |
 |    ├── utils/                

@@ -25,6 +25,11 @@ from .stationarity import (
     check_stationarity,
 )
 
+from .changepoints import (
+    detect_level_shifts
+)
+
+
 
 __all__ = [
     'smooth_lowess',
@@ -40,5 +45,6 @@ __all__ = [
     'adfuller',
     'kpss_test',
     'check_stationarity',
+    'detect_level_shifts'
     ]
 
