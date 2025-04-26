@@ -4,7 +4,8 @@ import pandas as pd
 import numpy as np
 from statsmodels.tsa.stattools import adfuller, kpss
 
-def adf_test(series: pd.Series, signif: float = 0.05, autolag: str = 'AIC') -> dict:
+
+def adf_test(series: pd.Series, signif: float = 0.05, autolag: str = "AIC") -> dict:
     """
     Perform Augmented Dickey-Fuller (ADF) test for stationarity.
 
@@ -31,7 +32,7 @@ def adf_test(series: pd.Series, signif: float = 0.05, autolag: str = 'AIC') -> d
             "n_obs": len(series),
             "critical_values": None,
             "is_stationary": False,
-            "error": "Series is constant"
+            "error": "Series is constant",
         }
 
     result = adfuller(series.dropna(), autolag=autolag)
@@ -43,10 +44,11 @@ def adf_test(series: pd.Series, signif: float = 0.05, autolag: str = 'AIC') -> d
         "lags_used": result[2],
         "n_obs": result[3],
         "critical_values": result[4],
-        "is_stationary": is_stationary
+        "is_stationary": is_stationary,
     }
 
-def kpss_test(series: pd.Series, signif: float = 0.05, regression: str = 'c') -> dict:
+
+def kpss_test(series: pd.Series, signif: float = 0.05, regression: str = "c") -> dict:
     """
     Perform KPSS test for stationarity.
 
@@ -73,10 +75,12 @@ def kpss_test(series: pd.Series, signif: float = 0.05, regression: str = 'c') ->
             "lags_used": None,
             "critical_values": None,
             "is_stationary": True,
-            "error": "Series is constant"
+            "error": "Series is constant",
         }
 
-    statistic, p_value, lags, critical_values = kpss(series.dropna(), regression=regression, nlags='auto')
+    statistic, p_value, lags, critical_values = kpss(
+        series.dropna(), regression=regression, nlags="auto"
+    )
     is_stationary = p_value > signif  # KPSS null hypothesis: series is stationary
     return {
         "test": "KPSS",
@@ -84,8 +88,9 @@ def kpss_test(series: pd.Series, signif: float = 0.05, regression: str = 'c') ->
         "p_value": p_value,
         "lags_used": lags,
         "critical_values": critical_values,
-        "is_stationary": is_stationary
+        "is_stationary": is_stationary,
     }
+
 
 def check_stationarity(series: pd.Series, signif: float = 0.05) -> dict:
     """
@@ -105,13 +110,12 @@ def check_stationarity(series: pd.Series, signif: float = 0.05) -> dict:
     """
     adf_result = adf_test(series, signif)
     kpss_result = kpss_test(series, signif)
-    
+
     return {
         "ADF": adf_result,
         "KPSS": kpss_result,
         "conclusion": {
             "ADF_stationary": adf_result["is_stationary"],
-            "KPSS_stationary": kpss_result["is_stationary"]
-        }
+            "KPSS_stationary": kpss_result["is_stationary"],
+        },
     }
-

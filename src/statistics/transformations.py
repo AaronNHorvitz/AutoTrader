@@ -3,6 +3,7 @@
 import numpy as np
 import pandas as pd
 
+
 def check_positive(series: pd.Series) -> None:
     """
     Check if the series contains only positive values.
@@ -19,6 +20,7 @@ def check_positive(series: pd.Series) -> None:
     """
     if (series <= 0).any():
         raise ValueError("Series must contain only positive values.")
+
 
 def log_transform(series: pd.Series) -> pd.Series:
     """
@@ -37,6 +39,7 @@ def log_transform(series: pd.Series) -> pd.Series:
     check_positive(series)
     return np.log(series)
 
+
 def difference(series: pd.Series, periods: int = 1) -> pd.Series:
     """
     Perform differencing operation on a series.
@@ -54,6 +57,7 @@ def difference(series: pd.Series, periods: int = 1) -> pd.Series:
         The differenced series.
     """
     return series.diff(periods=periods).dropna()
+
 
 def log_difference(series: pd.Series, periods: int = 1) -> pd.Series:
     """

@@ -147,7 +147,6 @@ def lowess_ci_pi(y_series, window_length=30, iterations=2, num_bootstrap=500, ci
     sigma = np.std(residuals)
     z_score = np.abs(np.percentile(np.random.randn(100000), (100 - ci) / 2))
 
-
     # Calculate confidence and prediction intervals
     ci_margin = z_score * (sigma / np.sqrt(window_length))
     ci_lower = fitted_lowess_smoother - ci_margin
