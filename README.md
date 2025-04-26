@@ -1,6 +1,74 @@
 # STAT 656 Autotrader
 
-Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project fetches stock tickers from Alpaca, stores them in a SQLite database. The plan is to use ARIMA models, LSTMSs and MCMC methods for stock selection while integrating exogenous data for an automated trader that exectues dail stock trades. 
+Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project fetches stock tickers and historical data from Alpaca, storing them in a structured SQLite database. It leverages **ARIMAX forecasting**, **LSTM models**, and **Bayesian (MCMC) methods** for systematic stock selection, portfolio optimization, and automated daily trading.
+
+---
+
+## Trading Strategy Overview
+
+The Autotrader implements a systematic trading approach combining:
+
+- **ARIMAX (ARIMA with Exogenous Inputs)** models for robust price forecasting.
+- **Bayesian Portfolio Optimization (MCMC)** for intelligent stock selection based on forecasted returns and volatility.
+
+---
+
+## Step-by-Step Workflow
+
+### 1. Data Collection and Storage
+
+- Fetch historical price data (~150 trading days) via the Alpaca API.
+- Store data efficiently in SQLite databases (`assets.db`, `exogenous.db`, etc.).
+
+### 2. Data Preprocessing and Stationarity Testing
+
+- Perform **log-transformation** and **first-order differencing** on price series.
+- Validate stationarity explicitly with the **Augmented Dickey-Fuller (ADF)** test.
+- If non-stationary, apply second differencing. Temporarily exclude stocks that fail stationarity or exhibit recent structural breaks (<100 stable data points).
+
+### 3. ARIMAX Forecasting
+
+- Fit **ARIMAX models**:
+  - Endogenous variables: Differenced **Closing**, **High**, and **Low** prices.
+  - Exogenous variable: Today's differenced **Opening price**.
+- Forecast the next **5 trading days** of Closing, High, and Low prices.
+
+### 4. Bayesian (MCMC) Portfolio Optimization
+
+- Combine ARIMAX forecasts with historical volatility and correlation metrics.
+- Use **MCMC methods** (e.g., PyMC, Stan, Pyro) to select optimal stocks based on cash availability and current holdings.
+
+### 5. Determining Trade Limits
+
+- Set specific buy/sell limits based on forecasts:
+  - **Buy Limit:** Near forecasted daily low price.
+  - **Sell Limit:** Near forecasted daily high price or strategically derived from closing forecasts.
+
+### 6. Automated Trade Execution
+
+- Execute trades automatically through the Alpaca Trading API.
+
+---
+
+## Workflow Summary
+
+```
+Historical Price Data
+          │
+Log-transform & First-Difference (Check Stationarity)
+          │
+Fit ARIMAX model (Closing, High, Low prices ~ Opening price)
+          │
+Forecast Today's Closing, High, Low Prices
+          │
+Combine with Historical Metrics (Returns, Volatility, Correlation)
+          │
+MCMC Portfolio Optimization (Determine Stocks to Trade)
+          │
+Set Buy/Sell Limits (From ARIMAX Forecasts)
+          │
+Execute Trades via Alpaca API
+```
 
 ## Prerequisites
 
