@@ -5,6 +5,7 @@ import numpy as np
 import warnings
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from src.statistics import log_difference, check_stationarity
+from src.statistics.smoothers import smooth_lowess
 from src.utils.db_utils import fetch_price_range
 
 warnings.filterwarnings("ignore")
@@ -57,71 +58,98 @@ def select_best_arimax(endog: pd.Series, exog: pd.Series, min_obs: int = 30):
     return best_model, best_order
 
 
-def forecast_arimax(model, exog_future, steps=1, alpha=0.05):
+def forecast_arimax(model, exog_future, last_price, smoother="lowess", smoothing_window=30, alpha=0.05):
     """
-    Generate forecast with prediction intervals using ARIMAX model.
+    Generate forecast with prediction intervals using ARIMAX model, integrating LOWESS smoothing.
 
-    Parameters:
+    Parameters
     ----------
     model : SARIMAXResults
         Fitted ARIMAX model.
-    exog_future : pd.Series or np.array
-        Future exogenous variables for prediction.
-    steps : int
-        Forecast steps ahead.
-    alpha : float
-        Significance level for prediction intervals.
+    exog_future : float
+        Next day's opening price (raw scale).
+    last_price : float
+        Most recent observed price from historical data (raw scale).
+    smoother : str, optional
+        Smoothing method ('lowess', 'exponential', 'sma'), default 'lowess'.
+    smoothing_window : int, optional
+        Window length for smoothing.
+    alpha : float, optional
+        Significance level for prediction intervals (default 0.05 for 95% intervals).
 
-    Returns:
+    Returns
     -------
     pd.DataFrame
-        Forecast and prediction intervals.
+        Forecasted value and prediction intervals on original scale.
     """
-    forecast_results = model.get_forecast(steps=steps, exog=exog_future)
-    predictions = forecast_results.predicted_mean
-    ci = forecast_results.conf_int(alpha=alpha)
+    # Compute log-differenced future exogenous value using smoother
+    log_exog_future = np.log(exog_future) - np.log(last_price)
+    exog_future_array = np.array([[log_exog_future]])
 
-    return pd.DataFrame({
-        "forecast": predictions,
-        "lower_ci": ci.iloc[:, 0],
-        "upper_ci": ci.iloc[:, 1]
+    # Get ARIMAX forecast on log-difference scale
+    forecast_results = model.get_forecast(steps=1, exog=exog_future_array)
+    pred_mean_logdiff = forecast_results.predicted_mean.iloc[0]
+    conf_int_logdiff = forecast_results.conf_int(alpha=alpha).iloc[0]
+
+    # Transform back to original scale using last smoothed price
+    forecast = np.exp(np.log(last_price) + pred_mean_logdiff)
+    lower_ci = np.exp(np.log(last_price) + conf_int_logdiff.iloc[0])
+    upper_ci = np.exp(np.log(last_price) + conf_int_logdiff.iloc[1])
+
+    forecast_df = pd.DataFrame({
+        "forecast": [forecast],
+        "lower_ci": [lower_ci],
+        "upper_ci": [upper_ci]
     })
 
+    return forecast_df
 
-def prepare_data_and_fit_arimax(df, price_col, exog_col, signif=0.05):
+
+def prepare_data_and_fit_arimax(df, price_col, exog_col, smoothing_window=30, signif=0.05):
     """
-    Prepare data, check stationarity, and fit ARIMAX model.
+    Prepare data, apply LOWESS smoothing, check stationarity, and fit ARIMAX model.
 
     Parameters:
     ----------
     df : pd.DataFrame
         DataFrame containing price and exogenous columns.
     price_col : str
-        Column name for target prices.
+        Target price column to forecast (e.g., 'close', 'high', 'low').
     exog_col : str
-        Column name for exogenous prices.
+        Exogenous price column (usually 'open').
+    smoothing_window : int, optional
+        Window length for LOWESS smoothing, default is 30.
+    signif : float, optional
+        Significance level for stationarity tests, default is 0.05.
 
     Returns:
     -------
     tuple
-        Fitted model, ARIMA order, log-differenced target series.
+        Fitted ARIMAX model, ARIMA order, and smoothed log-differenced series.
     """
-    price_logdiff = log_difference(df[price_col])
-    exog_logdiff = log_difference(df[exog_col])
 
+    # Apply LOWESS smoothing
+    price_smoothed = smooth_lowess(df[price_col], window_length=smoothing_window)
+    exog_smoothed = smooth_lowess(df[exog_col], window_length=smoothing_window)
+
+    # Log-difference the smoothed data
+    price_logdiff = log_difference(pd.Series(price_smoothed))
+    exog_logdiff = log_difference(pd.Series(exog_smoothed))
+
+    # Check stationarity
     stationarity_results = check_stationarity(price_logdiff, signif)
-
     price_stationary = (
         stationarity_results["conclusion"]["ADF_stationary"]
         and stationarity_results["conclusion"]["KPSS_stationary"]
     )
 
     if not price_stationary:
-        raise ValueError(f"{price_col} series is not stationary after log-differencing.")
+        raise ValueError(f"{price_col} series not stationary after smoothing and log-differencing.")
 
+    # Fit ARIMAX model
     model, order = select_best_arimax(price_logdiff, exog_logdiff)
 
-    return model, order, price_logdiff
+    return model, order, price_logdiff, exog_logdiff
 
 
 def prepare_and_validate_data(ticker: str, days_back: int = 150):
@@ -152,55 +180,27 @@ def prepare_and_validate_data(ticker: str, days_back: int = 150):
     return df.dropna()
 
 
-def fit_and_forecast_next_day(df: pd.DataFrame, target_col: str, exog_col: str, next_open_price: float):
-    """
-    Fit ARIMAX and forecast the next day's target price with prediction intervals.
-
-    Parameters:
-    ----------
-    df : pd.DataFrame
-        Prepared DataFrame with log-differenced prices.
-    target_col : str
-        Target column (e.g., 'close', 'high', 'low').
-    exog_col : str
-        Exogenous column (typically 'open').
-    next_open_price : float
-        Known next-day open price.
-
-    Returns:
-    -------
-    pd.DataFrame
-        Forecasted next-day price and prediction intervals.
-    """
-    endog = df[f'{target_col}_logdiff']
-    exog = df[f'{exog_col}_logdiff']
-
-    model, _ = select_best_arimax(endog, exog)
-
-    next_exog = np.array([[np.log(next_open_price) - np.log(df[exog_col].iloc[-1])]])
-
-    forecast_df = forecast_arimax(model, next_exog)
-
-    # Convert back to original scale
-    forecast_df['forecast'] = np.exp(np.log(df[target_col].iloc[-1]) + forecast_df['forecast'])
-    forecast_df['lower_ci'] = np.exp(np.log(df[target_col].iloc[-1]) + forecast_df['lower_ci'])
-    forecast_df['upper_ci'] = np.exp(np.log(df[target_col].iloc[-1]) + forecast_df['upper_ci'])
-
-    return forecast_df
-
-
 # Example usage within arimax.py for demonstration (can be removed in production)
-if __name__ == "__main__":
-    ticker = 'AAPL'
-    df = prepare_and_validate_data(ticker)
+ticker = 'AAPL'
+df = prepare_data(ticker)
+next_day_open_price = 150.00  # hypothetical opening price
 
-    next_day_open_price = 150.00  # hypothetical next-day open price
+# Smooth the last observed opening and closing prices
+smoothed_open = smooth_lowess(df['open'], window_length=30)[-1]
+smoothed_close = smooth_lowess(df['close'], window_length=30)[-1]
 
-    forecast_close = fit_and_forecast_next_day(df, 'close', 'open', next_day_open_price)
-    forecast_high = fit_and_forecast_next_day(df, 'high', 'open', next_day_open_price)
-    forecast_low = fit_and_forecast_next_day(df, 'low', 'open', next_day_open_price)
+# Fit ARIMAX model
+endog = log_difference(df['close'])
+exog = log_difference(df['open'])
+model, order = select_best_arimax(endog, exog)
 
-    print(f"\nForecast for {ticker} using ARIMAX:")
-    print("Close Price Forecast:\n", forecast_close)
-    print("High Price Forecast:\n", forecast_high)
-    print("Low Price Forecast:\n", forecast_low)
+# Forecast close price
+forecast_close = forecast_arimax(
+    model, 
+    exog_future=next_day_open_price,
+    last_price=smoothed_close,
+    smoother="lowess",
+    smoothing_window=30
+)
+
+print("Close forecast:", forecast_close)
