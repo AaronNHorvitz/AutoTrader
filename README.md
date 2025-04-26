@@ -57,9 +57,9 @@ The Autotrader implements a systematic trading approach combining:
 ```
 Historical Price Data
           │
-Data Preprocessing (Screen for 100 Days of Pricing Data)
+Data Preprocessing (Screen Stocks for 100 Days of Pricing Data)
           │
-Identify Structural Breaks (Screen for a 100 Days of Pricing Data After Structural Breaks)\
+Detect Level Shifts/ Structural Breaks (Screen Stocks for a 100 Days of Pricing Data After Structural Breaks)\
           │
 Log-transform & First-Difference (Check Stationarity)
           │
