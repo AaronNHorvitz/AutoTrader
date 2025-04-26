@@ -2,7 +2,8 @@
 import sqlite3
 import pandas as pd
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
+import os 
 from src.config import DB_DIR
 
 def get_db_connection(db_name='assets.db', print_statements=True):
@@ -35,11 +36,13 @@ def fetch_all_asset_metadata():
         pd.DataFrame: DataFrame containing all asset metadata.
     """
     conn = get_db_connection()
+
     # Debug: Check raw data
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM asset_metadata")
     rows = cursor.fetchall()
     columns = [desc[0] for desc in cursor.description]
+    
     print("Raw rows fetched:", rows[:5])  # Show first 5 rows
     print("Column names from DB:", columns)  # Show actual columns
     df = pd.read_sql("SELECT * FROM asset_metadata", conn)
@@ -200,3 +203,122 @@ def fetch_database_stock_tickers():
     past_ticker_list = pd.read_sql(query, conn)['symbol'].to_list()
     conn.close()
     return past_ticker_list
+
+def fetch_price_range(ticker, days_back, conn=None, calendar_days=False):
+    """
+    Retrieve OHLC (Open, High, Low, Close) stock price data for a given ticker symbol over a specified number of calendar or trading days.
+
+    This function queries the `asset_prices` table from the `assets.db` SQLite database and returns historical price data starting from the most recent available date. Users can specify whether the retrieval window should consider calendar days or strictly the last N trading days.
+
+    Parameters
+    ----------
+    ticker : str
+        Stock ticker symbol (e.g., 'AAPL').
+    days_back : int
+        Number of days to retrieve price data for.
+    conn : sqlite3.Connection, optional
+        An existing SQLite database connection. If None, a new connection to 'assets.db' is established and closed automatically.
+    calendar_days : bool, optional
+        If True, fetch prices from the last `days_back` calendar days.
+        If False (default), fetch prices from the last `days_back` trading days only.
+
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame containing historical OHLC data with the following columns:
+        - 'date' (datetime64): Date of the price record.
+        - 'open' (float): Opening price of the stock.
+        - 'high' (float): Highest price during the trading session.
+        - 'low' (float): Lowest price during the trading session.
+        - 'close' (float): Closing price of the stock.
+
+        If no price data is available for the given parameters, an empty DataFrame with the above columns is returned.
+
+    Raises
+    ------
+    sqlite3.Error
+        If a database connection or SQL query execution fails.
+    ValueError
+        If input parameters are invalid or result in no data retrieval.
+
+    Examples
+    --------
+    Retrieve Apple's closing prices for the past 60 calendar days:
+
+    >>> df_calendar = fetch_price_range('AAPL', 60, calendar_days=True)
+    >>> print(df_calendar.head())
+
+    Retrieve Microsoft's price data for the last 30 trading days:
+
+    >>> df_trading = fetch_price_range('MSFT', 30, calendar_days=False)
+    >>> print(df_trading.tail())
+    """
+    close_conn = False
+    if conn is None:
+        conn = get_db_connection('assets.db')
+        close_conn = True
+
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT MAX(date)
+        FROM asset_prices
+        WHERE asset_id = (SELECT asset_id FROM asset_metadata WHERE symbol = ?)
+    """, (ticker,))
+    most_recent_date = cursor.fetchone()[0]
+
+    if most_recent_date:
+        most_recent_date = datetime.strptime(most_recent_date, '%Y-%m-%d')
+
+        if calendar_days:
+            start_date = most_recent_date - timedelta(days=days_back)
+            start_date_str = start_date.strftime('%Y-%m-%d')
+            print(f"Querying {ticker} prices from {start_date_str} to {most_recent_date.strftime('%Y-%m-%d')}")
+            
+            query = """
+                SELECT date, open, high, low, close
+                FROM asset_prices
+                WHERE asset_id = (SELECT asset_id FROM asset_metadata WHERE symbol = ?)
+                AND date >= ?
+                ORDER BY date ASC
+            """
+            params = (ticker, start_date_str)
+
+        else:
+            # Fetch trading days (recent N entries ordered descending)
+            cursor.execute("""
+                SELECT date
+                FROM asset_prices
+                WHERE asset_id = (SELECT asset_id FROM asset_metadata WHERE symbol = ?)
+                ORDER BY date DESC
+                LIMIT ?
+            """, (ticker, days_back))
+            dates = cursor.fetchall()
+
+            if not dates:
+                print(f"No price data found for {ticker} in assets.db")
+                return pd.DataFrame(columns=['date', 'open', 'high', 'low', 'close'])
+
+            earliest_date = dates[-1][0]  # last row fetched is earliest date
+            print(f"Querying {ticker} prices for last {days_back} trading days from {earliest_date} to {most_recent_date.strftime('%Y-%m-%d')}")
+
+            query = """
+                SELECT date, open, high, low, close
+                FROM asset_prices
+                WHERE asset_id = (SELECT asset_id FROM asset_metadata WHERE symbol = ?)
+                AND date >= ?
+                ORDER BY date ASC
+            """
+            params = (ticker, earliest_date)
+
+        price_data = pd.read_sql_query(query, conn, params=params)
+        price_data['date'] = pd.to_datetime(price_data['date'])
+        print(f"Fetched {len(price_data)} price records for {ticker}")
+    else:
+        print(f"No price data found for {ticker} in assets.db")
+        price_data = pd.DataFrame(columns=['date', 'open', 'high', 'low', 'close'])
+
+    if close_conn:
+        conn.close()
+    
+    return price_data
+

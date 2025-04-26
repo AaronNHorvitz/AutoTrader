@@ -207,12 +207,10 @@ stat_656_autotrader/
 |    |   └── <add files as needed>      
 |    |
 |    ├── dashboard/            # Dashboard logic (e.g., Flask/Dash)
-|    |   ├── templates/        # HTML 
-|    |   └── static/           # CSS, JS 
+|    |   └── <add files as needed>  
 |    | 
 |    ├── tests/                # Unit tests 
-|    |   ├── test_models.py    # Test forecasting/trading
-|    |   └── test_etl.py       # Test DB setup/updates
+|    |   └── test_smoothers.py # Test statitical smoothing methods. 
 |    |
 |    ├── utils/                
 │    │   ├── __init__.py

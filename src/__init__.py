@@ -19,14 +19,19 @@ from .utils import (
     last_fetch_date,
     fetch_database_stock_tickers,
     populate_alpaca_full_history,
+    fetch_price_range
     )
 
 from .statistics import (
-    smooth_lowess,
+    smooth_lowess, 
+    exponential_smoother, 
+    lowess_ci_pi, 
+    exp_smooth_ci_pi,
+    sma_smoother
 )
 
 from .visualizations import (
-    plot_stock_trends,
+    plot_stock_trends_with_intervals,
 )
 
 from src.config import (
@@ -48,11 +53,16 @@ __all__ = [
     'populate_tickers',
     'recreate_database',
     'update_daily_prices',
-    'smooth_lowess',
-    'plot_stock_trends',
+    'plot_stock_trends_with_intervals',
     'last_data_date',
     'last_fetch_date',
     'fetch_database_stock_tickers',
     'fetch_alpaca_full_price_history',
     'populate_alpaca_full_history',
+    'smooth_lowess',
+    'exponential_smoother',
+    'lowess_ci_pi',
+    'exp_smooth_ci_pi',
+    'sma_smoother',
+    'fetch_price_range',
 ]
