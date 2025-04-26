@@ -269,6 +269,7 @@ stat_656_autotrader/
 |    |   ├── forecasting/      # Prediction logic 
 |    |   |   |
 |    |   |   ├── __init__.py   
+|    |   |   ├── arimax.py     # ARIMA forecasting, SARIMAX, ARIMAX, etc.
 |    |   |   └── <add files as needed>
 |    |   |    
 |    |   ├── trading/          # Trading logic
@@ -312,6 +313,7 @@ stat_656_autotrader/
 |    | 
 |    ├── tests/                # Unit tests 
 |    |   |
+│    │   ├── test_arimax.py
 │    │   ├── test_changepoints.py
 │    │   ├── test_smoothers.py 
 │    │   ├── test_stationarity.py 
