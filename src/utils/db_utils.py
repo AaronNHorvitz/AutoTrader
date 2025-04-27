@@ -322,3 +322,47 @@ def fetch_price_range(ticker, days_back, conn=None, calendar_days=False):
     
     return price_data
 
+def get_stock_name(symbol: str, db_name='assets.db', print_statements=False) -> str:
+    """
+    Fetch the full stock name from the asset_metadata table based on the ticker symbol.
+
+    Parameters
+    ----------
+    symbol : str
+        Stock ticker symbol (e.g., 'AAPL').
+    db_name : str, optional
+        Name of the database file to connect to (default: 'assets.db').
+    print_statements : bool, optional
+        If True, prints debugging statements (default: False).
+
+    Returns
+    -------
+    str
+        The stock's full name (e.g., 'Apple Inc.'). Returns None if the symbol isn't found.
+
+    Raises
+    ------
+    sqlite3.Error
+        If an issue occurs while connecting or querying the database.
+
+    Examples
+    --------
+    >>> name = get_stock_name('AAPL')
+    >>> print(name)
+    'Apple Inc.'
+    """
+    conn = get_db_connection(db_name, print_statements=print_statements)
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT name FROM asset_metadata WHERE symbol = ?
+    """, (symbol,))
+    
+    result = cursor.fetchone()
+    conn.close()
+
+    if result:
+        return result[0]
+    else:
+        if print_statements:
+            print(f"Symbol '{symbol}' not found in the asset_metadata table.")
+        return None
