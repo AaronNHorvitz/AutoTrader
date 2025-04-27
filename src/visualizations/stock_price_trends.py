@@ -135,13 +135,26 @@ def plot_stock_trends_with_intervals(
 
     if show_actual_line:
         plt.plot(dates, prices, color="dodgerblue", linewidth=0.5, label="Actual Line")
-
+    
+    # Scatter plot of actual prices
+    plt.scatter(
+        x=dates,
+        y=prices,
+        edgecolors="black",
+        facecolors="lightblue",
+        linewidth=1.5,
+        marker="o",
+        s=45,
+        alpha=1.0,
+        label=f"Actual {price_label} Prices",
+    )
+    
     plt.plot(
         dates,
         smoothed,
         color="red",
-        linestyle="solid",
-        linewidth=0.5,
+        linestyle="--",
+        linewidth=1.5,
         label=f"Smoothed {label_smoother}",
     )
 
@@ -170,17 +183,7 @@ def plot_stock_trends_with_intervals(
         label=f"{ci}% Prediction Interval",
     )
 
-    # Scatter plot of actual prices
-    plt.scatter(
-        x=dates,
-        y=prices,
-        edgecolors="red",
-        facecolors="red",
-        marker="o",
-        s=30,
-        alpha=0.75,
-        label=f"Actual {price_label} Prices",
-    )
+
     title_string = f"\n{symbol} {price_label} Prices ({num_dates} {date_type})\n{earliest_date} to {latest_date}\n"
     plt.title(title_string, fontsize=16)
     plt.xlabel("\nDate\n")
