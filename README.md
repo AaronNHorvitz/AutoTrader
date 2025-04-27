@@ -370,6 +370,7 @@ stat_656_autotrader/
 |    ├── visulazations/ 
 |    |   |      
 │    │   ├── __init__.py
+|    |   ├── exploratory_plots.py 
 |    |   ├── stock_price_trends.py  
 |    |   └── <add files as needed>      
 |    |
