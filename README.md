@@ -12,69 +12,135 @@ The Autotrader implements a systematic trading approach combining:
 - **Bayesian Portfolio Optimization (MCMC)** for intelligent stock selection based on forecasted returns and volatility.
 
 ---
+## Workflow 
 
-## Step-by-Step Workflow
-
-### 1. Data Collection and Storage
-
-- Fetch historical price data (~150 trading days) via the Alpaca API.
-- Store data efficiently in SQLite databases (`assets.db`, `exogenous.db`, etc.).
-
-### 2. Data Preprocessing and Stationarity / Structural Break Testing
-
-- Check for 100 days worth of pricing data
-- Perform **log-transformation** and **first-order differencing** on price series.
-- Identify Structural Breaks structural breaks - 100 days worth of trading data after a level shift / change point using **CUSUM test**, **Pettitt's test**, **Rolling window variance/ mean shift detection**
-- Validate stationarity explicitly with the **Augmented Dickey-Fuller (ADF)** test. 
-- Temporarily exclude stocks that fail stationarity or exhibit recent structural breaks (<100 stable data points).
-
-### 3. ARIMAX Forecasting
-
-- Fit **ARIMAX models**:
-  - Endogenous variables: Differenced **Closing**, **High**, and **Low** prices.
-  - Exogenous variable: Today's differenced **Opening price**.
-- Forecast the next **5 trading days** of Closing, High, and Low prices.
-
-### 4. Bayesian (MCMC) Portfolio Optimization
-
-- Combine ARIMAX forecasts with historical volatility and correlation metrics.
-- Use **MCMC methods** (e.g., PyMC, Stan, Pyro) to select optimal stocks based on cash availability and current holdings.
-
-### 5. Determining Trade Limits
-
-- Set specific buy/sell limits based on forecasts:
-  - **Buy Limit:** Near forecasted daily low price.
-  - **Sell Limit:** Near forecasted daily high price or strategically derived from closing forecasts.
-
-### 6. Automated Trade Execution
-
-- Execute trades automatically through the Alpaca Trading API.
-
----
-
-## Workflow Summary
+## ARIMAX Forecasting Workflow Summary
 
 ```
-Historical Price Data
-          │
-Data Preprocessing (Screen Stocks for 100 Days of Pricing Data)
-          │
-Detect Level Shifts/ Structural Breaks (Screen Stocks for a 100 Days of Pricing Data After Structural Breaks)
-          │
-Log-transform & First-Difference (Check Stationarity)
-          │
-Fit ARIMAX model (Closing, High, Low prices ~ Opening price)
-          │
-Forecast Today's Closing, High, Low Prices
-          │
-Combine with Historical Metrics (Returns, Volatility, Correlation)
-          │
-MCMC Portfolio Optimization (Determine Stocks to Trade)
-          │
-Set Buy/Sell Limits (From ARIMAX Forecasts)
-          │
-Execute Trades via Alpaca API
+Fetch Historical HLOC Data
+           │
+Check for Randomness & Randomness with Drift
+           │
+Smooth Data (LOWESS)
+           │
+Detect Level Shifts (Change points)
+           │
+Test Stationarity (ADF & KPSS)
+           │
+Check Predictive Power (Open prices around shifts)
+           │
+Conduct Final Randomness Tests (Runs, Ljung-Box, etc.)
+           │
+Confirm Data Suitable for ARIMAX
+           │
+Integrate Opening Prices (Transfer Function)
+           │
+Fit & Forecast ARIMAX Model
+
+
 ```
+## MCMC Retraining Periods
+ - MCMC Retrains every weekend
+ - MCMC Retrains every Market Holiday (Except when it's integrated into a 3 day weekend)
+
+## Integrated Trading Workflow (Including MCMC Selection and Unsuitable Stocks)
+
+```
+Fetch Daily Historical Data (HLOC) for All Candidate Stocks
+                       │
+         Fetch the Morning's Open Price Data
+                       │
+       Perform Level Shift and Stationarity Tests
+                       │
+      Data Suitable for Forecasting (ARIMAX Forecasting)?
+            ┌───────────┴───────────┐
+            │                       │
+           Yes                      No
+            │                       │               
+Flag as Trustworthy           Flag as Untrustworthy
+Forecast                      Forecast (Consider Selling)
+            └─────────────┬─────────┘
+                          │
+               Forecast Prices (H, L, C)  
+                          │
+            Perform MCMC Portfolio Optimization
+     (Identifies Optimal Stocks to Buy or Sell Based on Criteria)
+                          │
+        ┌─────────────────┴─────────────────┐
+        │                                   │
+ MCMC Identified as                   MCMC Identified as 
+ BUY candidate                        SELL candidate
+        │                                   │
+ Suitable?                           Suitable?
+ │                                   │
+ ├─Yes: Forecast-based─┐             ├─Yes: Forecast-based─┐
+ │ BUY LIMIT           │             │ SELL LIMIT           │
+ │ (Forecast Low-Close)│             │ (Forecast High-Close)│
+ │                     │             │                      │
+ │ Immediately set     │             │ Immediately set      │
+ │ Stop-loss Sell Limit│             │ Buyback Limit        │
+ │ (below Low)         │             │ (above High)         │
+ │                     │             │                      │
+ ├─No: Conservative────┤             ├─No: Conservative─────┤
+ │ Set conservative    │             │ Set conservative      │
+ │ BUY LIMIT at recent │             │ SELL LIMIT at recent  │
+ │ stable low          │             │ stable high           │
+ │                     │             │                       │
+ │ Immediately set     │             │ Immediately set       │
+ │ strict Stop-loss    │             │ strict Buyback Limit  │
+ │ (tight range)       │             │ (tight range)         │
+ └─────────────────────┘             └───────────────────────┘
+              │                               │
+     Execute Trades via Alpaca API (buy or sell as directed)
+              │                               │
+              │                               │
+   Daily ARIMAX Forecast Update     Daily ARIMAX Forecast Update
+Adjust stop-loss ↑ only, Adjust buyback limit ↓ only (adaptive strategy)
+              │                               │
+              │                               │
+Market Surge Detection & Protection (Catch unexpected spikes)
+   - Monitor forecasted vs. actual High/Low deviations
+   - Flag large surge in prices (beyond forecast intervals)
+   - Trigger immediate review or special actions
+```
+
+## Price Setting Formulas 
+### Buy Limit
+$Buy Limit = \frac{Forecasted Low + Forecasted Close }{2}$
+
+### Initial Defensive Sell Limit After Purchase (Stop-loss): (to guard against immediate stock price plunges)
+
+$Stop Loss = Forecasted Low - (Forecasted Close - Forecasted Low) x 0.5$
+
+### Sell Limit
+$Suy Limit = \frac{Forecasted High + Forecasted Close }{2}$
+
+### Stock Purchase Example:
+The MCMC model identifies a stock for purchase. The forecasted low is $150, and the forecasted close is $155. 
+- The Auto-Trader will execute a **Buy-Limit Order** at ($150 + $155)/2 = **$152.50**
+- After the purchase is executed, the Auto-Trader will immeidately set a **Stop-Loss Order** at  $150 - ($155 - $150) × 0.5 = **$147.50**
+- The Auto-Trader will record the transaction and update the financials. 
+
+### Stock Sale Example:
+The MCMC model identifies a stock to sell. The forecasted high is $160, and the forecasted close is $155.
+ - The Auto-Trader will execute a **Sell-Limit Order** at ($160 + $155)/2 = **$157.50**
+ - If the trade fails to execute, and the previous **Stop-Loss Order** fails to execute the Auto-Trader will execute a *Sell-Market Order* five minutes prior to the market close.
+
+### Daily Stop-Loss Order Updates
+ - The Auto-Trader will update **Stop-Loss Orders** daily based on daily forecasts. 
+
+## Special Circumstances
+### Circumstances
+- If the stock is flagged as "unsuitable," trade cautiously and defensively to minimize potential losses.
+- Continuously monitor model accuracy, especially during market volatility or periods of instability.
+- Leverage the flexibility of the automated system to rapidly respond to emerging market conditions.
+- Monitoring: Track actual market prices vs. forecast intervals.
+- Surge Detection: Flag significant deviations beyond predicted intervals.
+
+### Immediate Response:
+- Temporarily flag stock as unsuitable.
+- Execute conservative orders to capitalize on unexpected surges or exit positions safely.
+- Re-evaluate stability after shifts. Resume standard trading if conditions stabilize.
 
 ## Prerequisites
 
