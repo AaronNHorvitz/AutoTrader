@@ -2,8 +2,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from src.statistics.smoothers import lowess_ci_pi, exp_smooth_ci_pi, sma_ci_pi
-from src.utils.db_utils import get_db_connection, fetch_price_range
-
+from src.utils.db_utils import get_db_connection, fetch_price_range, get_stock_name
 
 def plot_stock_trends_with_intervals(
     symbol, 
@@ -90,6 +89,7 @@ def plot_stock_trends_with_intervals(
     # Initialize database connection and fetch price data
     conn = get_db_connection('assets.db')
     price_data = fetch_price_range(symbol, days_back, conn=conn)
+    stock_name = get_stock_name(symbol, conn=conn)
     conn.close()
     
     # Extract price information
@@ -132,7 +132,7 @@ def plot_stock_trends_with_intervals(
     # Matplotlib gumph ---
 
     # Set figure params
-    plt.figure(figsize=(14, 6), dpi=150)
+    plt.figure(figsize=(14, 7), dpi=150)
 
     if show_actual_line:
         plt.plot(dates, prices, color="dodgerblue", linewidth=0.5, label="Actual Line")
@@ -185,7 +185,7 @@ def plot_stock_trends_with_intervals(
     )
 
 
-    title_string = f"\n{symbol} {price_label} Prices ({num_dates} {date_type})\n{earliest_date} to {latest_date}\n"
+    title_string = f"\n{stock_name}({symbol})\n\n{price_label} Prices({num_dates} {date_type})\n{smoothing_window}-Day Smoothing Window\n{earliest_date} to {latest_date}\n"
     plt.title(title_string, fontsize=16)
     plt.xlabel("\nDate\n")
     plt.ylabel("\nPrice (USD)\n")

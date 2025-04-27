@@ -24,7 +24,8 @@ from .db_utils import (
     last_data_date, 
     last_fetch_date,
     fetch_database_stock_tickers,
-    fetch_price_range
+    fetch_price_range,
+    get_stock_name
 )
 
 __all__ = [
@@ -45,5 +46,6 @@ __all__ = [
     'last_fetch_date',
     'fetch_database_stock_tickers',
     'populate_alpaca_full_history',
-    'fetch_price_range'
+    'fetch_price_range',
+    'get_stock_name'
 ]
