@@ -30,7 +30,9 @@ def select_best_arimax(endog: pd.Series, exog: pd.Series, min_obs: int = 30):
         (Fitted model, best ARIMA order)
     """
     if len(endog) < min_obs or len(exog) < min_obs:
-        raise ValueError(f"Insufficient data: Need at least {min_obs} observations, got {len(endog)}")
+        raise ValueError(
+            f"Insufficient data: Need at least {min_obs} observations, got {len(endog)}"
+        )
 
     if endog.var() == 0 or exog.var() == 0:
         raise ValueError("Input series cannot be constant (zero variance).")
@@ -58,7 +60,9 @@ def select_best_arimax(endog: pd.Series, exog: pd.Series, min_obs: int = 30):
     return best_model, best_order
 
 
-def forecast_arimax(model, exog_future, last_price, smoother="lowess", smoothing_window=30, alpha=0.05):
+def forecast_arimax(
+    model, exog_future, last_price, smoother="lowess", smoothing_window=30, alpha=0.05
+):
     """
     Generate forecast with prediction intervals using ARIMAX model, integrating LOWESS smoothing.
 
@@ -96,16 +100,16 @@ def forecast_arimax(model, exog_future, last_price, smoother="lowess", smoothing
     lower_ci = np.exp(np.log(last_price) + conf_int_logdiff.iloc[0])
     upper_ci = np.exp(np.log(last_price) + conf_int_logdiff.iloc[1])
 
-    forecast_df = pd.DataFrame({
-        "forecast": [forecast],
-        "lower_ci": [lower_ci],
-        "upper_ci": [upper_ci]
-    })
+    forecast_df = pd.DataFrame(
+        {"forecast": [forecast], "lower_ci": [lower_ci], "upper_ci": [upper_ci]}
+    )
 
     return forecast_df
 
 
-def prepare_data_and_fit_arimax(df, price_col, exog_col, smoothing_window=30, signif=0.05):
+def prepare_data_and_fit_arimax(
+    df, price_col, exog_col, smoothing_window=30, signif=0.05
+):
     """
     Prepare data, apply LOWESS smoothing, check stationarity, and fit ARIMAX model.
 
@@ -144,7 +148,9 @@ def prepare_data_and_fit_arimax(df, price_col, exog_col, smoothing_window=30, si
     )
 
     if not price_stationary:
-        raise ValueError(f"{price_col} series not stationary after smoothing and log-differencing.")
+        raise ValueError(
+            f"{price_col} series not stationary after smoothing and log-differencing."
+        )
 
     # Fit ARIMAX model
     model, order = select_best_arimax(price_logdiff, exog_logdiff)
@@ -171,36 +177,15 @@ def prepare_and_validate_data(ticker: str, days_back: int = 150):
     df = fetch_price_range(ticker, days_back)
     df.dropna(inplace=True)
 
-    for col in ['open', 'high', 'low', 'close']:
-        df[f'{col}_logdiff'] = log_difference(df[col])
-        stationarity = check_stationarity(df[f'{col}_logdiff'])
-        if not (stationarity['conclusion']['ADF_stationary'] and stationarity['conclusion']['KPSS_stationary']):
-            raise ValueError(f"{col.capitalize()} series is not stationary after log-differencing.")
+    for col in ["open", "high", "low", "close"]:
+        df[f"{col}_logdiff"] = log_difference(df[col])
+        stationarity = check_stationarity(df[f"{col}_logdiff"])
+        if not (
+            stationarity["conclusion"]["ADF_stationary"]
+            and stationarity["conclusion"]["KPSS_stationary"]
+        ):
+            raise ValueError(
+                f"{col.capitalize()} series is not stationary after log-differencing."
+            )
 
     return df.dropna()
-
-
-# Example usage within arimax.py for demonstration (can be removed in production)
-ticker = 'AAPL'
-df = prepare_data(ticker)
-next_day_open_price = 150.00  # hypothetical opening price
-
-# Smooth the last observed opening and closing prices
-smoothed_open = smooth_lowess(df['open'], window_length=30)[-1]
-smoothed_close = smooth_lowess(df['close'], window_length=30)[-1]
-
-# Fit ARIMAX model
-endog = log_difference(df['close'])
-exog = log_difference(df['open'])
-model, order = select_best_arimax(endog, exog)
-
-# Forecast close price
-forecast_close = forecast_arimax(
-    model, 
-    exog_future=next_day_open_price,
-    last_price=smoothed_close,
-    smoother="lowess",
-    smoothing_window=30
-)
-
-print("Close forecast:", forecast_close)
