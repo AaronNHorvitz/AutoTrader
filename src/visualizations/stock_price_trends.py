@@ -156,7 +156,7 @@ def plot_stock_trends_with_intervals(
         color="red",
         linestyle="--",
         linewidth=1.5,
-        label=f"Smoothed {label_smoother}",
+        label=f"Smoothed {label_smoother} ({smoothing_window}-day smoothing window)",
     )
 
     # Fill Confidence Interval (dark grey)
@@ -185,7 +185,7 @@ def plot_stock_trends_with_intervals(
     )
 
 
-    title_string = f"\n{stock_name}({symbol})\n\n{price_label} Prices({num_dates} {date_type})\n{smoothing_window}-Day Smoothing Window\n{earliest_date} to {latest_date}\n"
+    title_string = f"\n{stock_name}({symbol})\n{price_label} Prices({num_dates} {date_type})\n{earliest_date} to {latest_date}\n"
     plt.title(title_string, fontsize=16)
     plt.xlabel("\nDate\n")
     plt.ylabel("\nPrice (USD)\n")
