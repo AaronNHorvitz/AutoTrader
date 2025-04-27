@@ -113,7 +113,7 @@ def plot_stock_trends_with_intervals(
 
     # Initialize database connection and fetch price data
     conn = get_db_connection('assets.db')
-    price_data = fetch_price_range(symbol, days_back, conn=conn)
+    price_data = fetch_price_range(symbol, days_back, conn=conn, calendar_days=calendar_days)
     stock_name = get_stock_name(symbol, conn=conn)
     conn.close()
     
