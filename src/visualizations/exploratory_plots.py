@@ -8,6 +8,7 @@ import numpy as np
 from src.statistics.smoothers import lowess_ci_pi, exp_smooth_ci_pi, sma_ci_pi
 from src.statistics.changepoints import detect_level_shifts
 from src.utils.db_utils import get_db_connection, fetch_price_range, get_stock_name
+from src.statistics.transformations import log_difference
 
 def ax_smoothed_prices(
     symbol, 
@@ -209,14 +210,6 @@ def ax_smoothed_prices(
 
     return ax
 
-
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-import pandas as pd
-from src.statistics.smoothers import lowess_ci_pi, exp_smooth_ci_pi, sma_ci_pi
-from src.statistics.changepoints import detect_level_shifts
-from src.utils.db_utils import get_db_connection, fetch_price_range, get_stock_name
-
 def ax_residuals(
     symbol,
     days_back=125,
@@ -325,7 +318,6 @@ def ax_residuals(
     residuals = prices - smoothed
 
     # If an existing ax is provided, we assume the user is handling the figure setup
-    
     if ax is None:
     
         # Create a figure with a gridspec layout
@@ -396,6 +388,253 @@ def ax_residuals(
 
     # Horizontal histogram for residual distribution
     ax_hist.hist(residuals, bins=50, orientation='horizontal', color='lightblue', alpha=0.4, edgecolor='black')
+    ax_hist.axhline(0, color='red', linestyle='--', linewidth=3.0)
+    ax_hist.grid(False)
+    ax_hist.set_xlabel("Freq.")
+    ax_hist.set_yticklabels([])
+
+    if show_legend:
+        ax.legend()
+
+    # Adjust layout to prevent overlap
+    plt.tight_layout()
+
+    return ax
+
+def ax_log_difference(
+    symbol,
+    days_back=125,
+    smoothing_window=30,
+    smoother="lowess",
+    price_type="close",
+    apply_smoothing=True,
+    periods=1,  
+    calendar_days=False,
+    level_shifts_model=None,
+    level_shifts_penalty=5,
+    level_shifts_min_size=10,
+    ax=None,
+    show_title=True,
+    show_x_label=True,
+    show_y_label=True,
+    show_grid=True,
+    show_legend=True,
+    figsize=(14, 7),
+    dpi=150,
+):
+    """
+    Plot log-differenced stock price data, with an optional smoothing step, along with a horizontal histogram to assess the distribution.
+
+    This function retrieves historical stock prices from a database, optionally applies a smoothing technique,
+    computes the log-differenced series, and plots the result as a scatter plot with a horizontal histogram on the side.
+    It also supports optional level shift detection.
+
+    Parameters
+    ----------
+    symbol : str
+        Stock ticker symbol (e.g., 'AAPL').
+    days_back : int, optional
+        Number of days of historical data to fetch, default is 125.
+    smoothing_window : int, optional
+        Window length for smoothing algorithm, default is 30. Used only if `apply_smoothing` is True.
+    smoother : {'lowess', 'exponential', 'sma'}, optional
+        Smoothing method to apply before log-differencing, default is 'lowess'.
+        - 'lowess': Locally Weighted Scatterplot Smoothing.
+        - 'exponential': Exponential smoothing.
+        - 'sma': Simple Moving Average.
+        Used only if `apply_smoothing` is True.
+    price_type : {'open', 'close', 'high', 'low'}, optional
+        Type of price data to use, default is 'close'.
+    apply_smoothing : bool, optional
+        If True, applies the specified smoothing method to the price data before log-differencing, default is True.
+    periods : int, optional
+        Number of periods for differencing in log-difference calculation, default is 1.
+    calendar_days : bool, optional
+        If True, uses calendar days, otherwise trading days, default is False.
+    level_shifts_model : {'l2', 'l1', 'rbf', 'linear', 'normal', None}, optional
+        Ruptures model for detecting level shifts in the log-differenced series, default is None.
+    level_shifts_penalty : float, optional
+        Penalty for level shift detection, default is 5.
+    level_shifts_min_size : int, optional
+        Minimum points between detected shifts, default is 10.
+    ax : matplotlib.axes.Axes, optional
+        Existing axes to plot on. If None, a new figure and axes are created.
+    show_title : bool, optional
+        Show the plot title, default is True.
+    show_x_label : bool, optional
+        Show the x-axis label ('Date'), default is True.
+    show_y_label : bool, optional
+        Show the y-axis label ('Log-Difference'), default is True.
+    show_grid : bool, optional
+        Show grid lines, default is True.
+    show_legend : bool, optional
+        Display legend, default is True.
+    figsize : tuple, optional
+        Figure size as (width, height) in inches, default is (14, 7).
+    dpi : int, optional
+        Dots per inch (resolution) of the figure, default is 150.
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+        Axes containing the log-difference plot with horizontal histogram.
+
+    Raises
+    ------
+    ValueError
+        If price data contains non-positive values, as log-difference requires strictly positive data.
+        If an invalid `price_type` or `smoother` is provided.
+
+    Examples
+    --------
+    Plot log-differenced closing prices of Apple stock with LOWESS smoothing:
+
+    >>> ax_log_difference('AAPL', days_back=90, smoother='lowess')
+
+    Plot log-differenced high prices of Tesla without smoothing:
+
+    >>> ax_log_difference(
+    ...     'TSLA',
+    ...     price_type='high',
+    ...     apply_smoothing=False
+    ... )
+    """
+    # Fetch historical data
+    conn = get_db_connection('assets.db')
+    price_data = fetch_price_range(symbol, days_back, conn=conn, calendar_days=calendar_days)
+    stock_name = get_stock_name(symbol, conn=conn)
+    conn.close()
+
+    if price_type not in ["open", "close", "high", "low"]:
+        raise ValueError("Invalid price type. Choose 'open', 'close', 'high', or 'low'.")
+
+    if price_type == "open":
+        price_label = "Opening"
+    elif price_type == "close":
+        price_label = "Closing"
+    elif price_type == "high":
+        price_label = "High"
+    else:
+        price_label = "Low"
+
+    prices = price_data[price_type]
+    dates = price_data['date']
+
+    if calendar_days:
+        date_type = "Calendar Days"
+    else:
+        date_type = "Trading Days"
+
+    # Apply smoothing
+    if apply_smoothing:
+        if smoother == "lowess":
+            smoothed, ci_lower, ci_upper, pi_lower, pi_upper = lowess_ci_pi(
+                prices, window_length=smoothing_window, ci=95
+            )
+            label_smoother = "LOWESS"
+            # Convert smoothed array to pd.Series with the same index as prices
+            prices = pd.Series(smoothed, index=prices.index)
+
+        elif smoother == "exponential":
+            smoothed, ci_lower, ci_upper, pi_lower, pi_upper = exp_smooth_ci_pi(
+                prices, window_length=smoothing_window, ci=95
+            )
+            label_smoother = "Exponential"
+            # Convert smoothed array to pd.Series with the same index as prices
+            prices = pd.Series(smoothed, index=prices.index)
+
+        elif smoother == "sma":
+            smoothed, ci_lower, ci_upper, pi_lower, pi_upper = sma_ci_pi(
+                prices, window_length=smoothing_window, ci=95
+            )
+            label_smoother = "Simple Moving Average"
+            # Convert smoothed array to pd.Series with the same index as prices
+            prices = pd.Series(smoothed, index=prices.index)
+
+        else:
+            raise ValueError("Invalid smoother type.")
+    
+    # Compute log-differenced series
+    try:
+        log_diff_series = log_difference(prices, periods=periods)
+    except ValueError as e:
+        raise ValueError(f"Cannot compute log-difference: {str(e)}")
+
+    # Align dates with log-differenced series
+    # log_difference drops the first 'periods' rows due to differencing
+    log_diff_dates = dates.iloc[periods:]
+
+    # If an existing ax is provided, we assume the user is handling the figure setup
+    if ax is None:
+        # Create a figure with a gridspec layout
+        fig = plt.figure(figsize=figsize, dpi=dpi)
+        gs = gridspec.GridSpec(1, 2, width_ratios=[4, 1])  # 4:1 width ratio for scatter plot and histogram
+
+        # Create the main scatter plot axes
+        ax = fig.add_subplot(gs[0])
+
+        # Create the histogram axes
+        ax_hist = fig.add_subplot(gs[1], sharey=ax)  # Share y-axis with the main plot
+    else:
+        # If ax is provided, we need to create the histogram axes in the same figure
+        fig = ax.get_figure()
+        gs = gridspec.GridSpec(1, 2, width_ratios=[4, 1], figure=fig)
+        # Since ax is already provided, we reuse it
+        ax.set_position(gs[0].get_position(fig))  # Resize ax to fit the gridspec layout
+        ax_hist = fig.add_subplot(gs[1], sharey=ax)
+
+    # Scatter log-differences
+    ax.scatter(log_diff_dates, log_diff_series, edgecolors="black", facecolors="lightblue",
+               linewidth=1.5, marker="o", s=55, alpha=1.0,
+               label=f"Log-Differenced {price_label} Prices")
+
+    # Draw thin lines from y=0 to each scatter point
+    ax.vlines(log_diff_dates, 0, log_diff_series, colors='lightblue', linestyles='solid', linewidth=0.5, alpha=0.7)
+
+    # Plot horizontal line at y=0
+    ax.axhline(0, color='red', linestyle='--', linewidth=3.0, label="Zero Line")
+
+    # Level shift detection (optional)
+    if level_shifts_model:
+        shift_indices = detect_level_shifts(
+            pd.Series(log_diff_series),
+            model=level_shifts_model,
+            penalty=level_shifts_penalty,
+            min_size=level_shifts_min_size
+        )
+        shift_dates = log_diff_dates.iloc[shift_indices]
+        for shift_date in shift_dates:
+            ax.axvline(x=shift_date, color='purple', linestyle='--', linewidth=1.2, alpha=0.75,
+                       label='Detected Level Shift' if shift_date == shift_dates.iloc[0] else "")
+
+    latest_date = log_diff_dates.max().strftime('%m/%d/%Y')
+    earliest_date = log_diff_dates.min().strftime('%m/%d/%Y')
+
+    if show_title:
+        if apply_smoothing:
+            title = (f"\n{stock_name} ({symbol})\nLog-Differenced {label_smoother} Smoothed {price_label} Prices ({len(log_diff_dates)} {date_type})\n"
+                     f"{earliest_date} to {latest_date}\n")
+        else:
+            title = (f"\n{stock_name} ({symbol})\nLog-Differenced {price_label} Prices ({len(log_diff_dates)} {date_type})\n"
+                     f"{earliest_date} to {latest_date}\n")
+        ax.set_title(title, fontsize=16)
+    ax.set_xlabel("Date") if show_x_label else None
+    ax.set_ylabel("Log-Difference") if show_y_label else None
+    ax.grid(show_grid)
+
+    # Set vertical limits for log-differences
+    maximum_vert_limit = max(
+        abs(log_diff_series.max()),
+        abs(log_diff_series.min())
+    ) * 1.10  # 10% padding
+
+    ax.set_ylim(
+        bottom=-maximum_vert_limit,
+        top=maximum_vert_limit
+    )
+
+    # Horizontal histogram for log-difference distribution
+    ax_hist.hist(log_diff_series, bins=50, orientation='horizontal', color='lightblue', alpha=0.4, edgecolor='black')
     ax_hist.axhline(0, color='red', linestyle='--', linewidth=3.0)
     ax_hist.grid(False)
     ax_hist.set_xlabel("Freq.")

@@ -11,11 +11,14 @@ from .stock_price_trends import (
     
 from .exploratory_plots import (
     ax_smoothed_prices,
-    ax_residuals
+    ax_residuals, 
+    ax_log_difference, 
+
 )
 
 __all__ = [
     'plot_stock_trends_with_intervals',
     'ax_smoothed_prices',
     'ax_residuals',
+    'x_log_difference'
     ]

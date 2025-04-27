@@ -33,7 +33,8 @@ from .statistics import (
 from .visualizations import (
     plot_stock_trends_with_intervals,
     ax_smoothed_prices,
-    ax_residuals
+    ax_residuals,
+    ax_log_difference
 )
 
 from src.config import (
@@ -68,5 +69,6 @@ __all__ = [
     'sma_smoother',
     'fetch_price_range',
     'ax_smoothed_prices',
-    'ax_residuals'
+    'ax_residuals',
+    'ax_log_difference'
 ]
