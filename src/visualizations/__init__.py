@@ -9,7 +9,7 @@ from .stock_price_trends import (
     )
     
     
-from .exploratory_visualizations import (
+from .exploratory_plots import (
     ax_smoothed_prices,
 )
 

@@ -1,4 +1,4 @@
-# src/visualizations/exploratory_visualizations.py
+# src/visualizations/exploratory_plots.py
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
