@@ -97,8 +97,9 @@ def plot_stock_trends_with_intervals(
 
     # Extract date information
     dates = price_data['date']
-    latest_date = dates.max().strftime('%Y-%m-%d')
-    earliest_date = dates.min().strftime('%Y-%m-%d')
+    date_format = '%m/%d/%Y'
+    latest_date = dates.max().strftime(date_format)
+    earliest_date = dates.min().strftime(date_format)
     num_dates = len(dates.unique())
 
     if calendar_days:
@@ -164,7 +165,7 @@ def plot_stock_trends_with_intervals(
         ci_lower,
         ci_upper,
         color="dodgerblue",
-        edgecolor="dodgerblue",
+        edgecolor="black",
         linewidth=0.5,
         alpha=0.2,
         label=f"{ci}% Confidence Interval",
@@ -179,7 +180,7 @@ def plot_stock_trends_with_intervals(
         edgecolor="black",
         linestyle="--",
         linewidth=0.5,
-        alpha=0.5,
+        alpha=0.30,
         label=f"{ci}% Prediction Interval",
     )
 
