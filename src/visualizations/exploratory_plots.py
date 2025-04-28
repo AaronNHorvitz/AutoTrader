@@ -584,12 +584,12 @@ def ax_log_difference(
         ax_hist = fig.add_subplot(gs[1], sharey=ax)
 
     # Scatter log-differences
-    ax.scatter(log_diff_dates, log_diff_series, edgecolors="black", facecolors="lightblue",
+    ax.scatter(log_diff_dates, log_diff_series, edgecolors="black", facecolors="red",
                linewidth=1.5, marker="o", s=55, alpha=1.0,
                label=f"Log-Differenced {price_label} Prices")
 
     # Draw thin lines from y=0 to each scatter point
-    ax.vlines(log_diff_dates, 0, log_diff_series, colors='lightblue', linestyles='solid', linewidth=0.5, alpha=0.7)
+    ax.vlines(log_diff_dates, 0, log_diff_series, colors='red', linestyles='solid', linewidth=0.5, alpha=0.7)
 
     # Plot horizontal line at y=0
     ax.axhline(0, color='red', linestyle='--', linewidth=3.0, label="Zero Line")
