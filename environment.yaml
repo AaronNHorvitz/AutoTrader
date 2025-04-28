@@ -7,7 +7,7 @@ dependencies:
   - ipykernel=6.15.2  # Kernel for running Python code in Jupyter notebooks
   - requests=2.32.3  # HTTP library for making web requests (e.g., fetching API data)
   - pandas=2.2.3  # Data manipulation and analysis library (great for time series, tables)
-  - numpy=1.26.4  # Numerical computing library (arrays, math operations)
+  - numpy=1.25.2  # Numerical computing library (arrays, math operations)
   - scikit-learn=1.3.0  # Machine learning library (regression, classification, clustering)
   - scipy=1.15.1  # Scientific computing (stats, optimization, signal processing)
   - statsmodels=0.14.0  # Statistical modeling (e.g., time series analysis, econometrics)
