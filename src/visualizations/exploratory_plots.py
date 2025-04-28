@@ -659,8 +659,9 @@ def ax_arima_forecast(
     smoother="lowess",
     price_type="close",
     exog_price_type="open",
-    periods=1,
+    max_differencing_periods=2,
     ci=95,
+    minimum_observations=30,
     calendar_days=False,
     level_shifts_model=None,
     level_shifts_penalty=5,
@@ -675,81 +676,9 @@ def ax_arima_forecast(
     figsize=(14, 7),
     dpi=150,
 ):
-    """
-    Plot smoothed stock price data with an ARIMA forecast, including a train-test split and prediction intervals.
-
-    This function retrieves historical stock prices, applies smoothing and log-differencing, splits the data into
-    training and test sets, fits an ARIMA model, and forecasts future prices with prediction intervals. The plot
-    shows the training data, test data, and forecasted prices with intervals.
-
-    Parameters
-    ----------
-    symbol : str
-        Stock ticker symbol (e.g., 'AAPL').
-    days_back : int, optional
-        Number of days of historical data to fetch, default is 125.
-    test_size : int, optional
-        Number of days to use for the test set, default is 5.
-    forecast_horizon : int, optional
-        Number of days to forecast into the future, default is 5.
-    smoothing_window : int, optional
-        Window length for smoothing algorithm, default is 40.
-    smoother : {'lowess', 'exponential', 'sma'}, optional
-        Smoothing method to apply to the price data, default is 'lowess'.
-        - 'lowess': Locally Weighted Scatterplot Smoothing.
-        - 'exponential': Exponential smoothing.
-        - 'sma': Simple Moving Average.
-    price_type : {'open', 'close', 'high', 'low'}, optional
-        Type of price data to forecast, default is 'close'.
-    exog_price_type : {'open', 'close', 'high', 'low'}, optional
-        Type of price data to use as the exogenous variable, default is 'open'.
-    periods : int, optional
-        Number of periods for differencing in log-difference calculation, default is 1.
-    ci : float, optional
-        Confidence level for prediction intervals (as a percentage), default is 95.
-    calendar_days : bool, optional
-        If True, uses calendar days, otherwise trading days, default is False.
-    level_shifts_model : {'l2', 'l1', 'rbf', 'linear', 'normal', None}, optional
-        Ruptures model for detecting level shifts in the smoothed series, default is None.
-    level_shifts_penalty : float, optional
-        Penalty for level shift detection, default is 5.
-    level_shifts_min_size : int, optional
-        Minimum points between detected shifts, default is 10.
-    strict_stationarity : bool, optional
-        If True, enforces strict stationarity (both ADF and KPSS must pass); if False, proceeds with a warning if the series is not stationary, default is True.
-    ax : matplotlib.axes.Axes, optional
-        Existing axes to plot on. If None, a new figure and axes are created.
-    show_title : bool, optional
-        Show the plot title, default is True.
-    show_x_label : bool, optional
-        Show the x-axis label ('Date'), default is True.
-    show_y_label : bool, optional
-        Show the y-axis label ('Price (USD)'), default is True.
-    show_grid : bool, optional
-        Show grid lines, default is True.
-    show_legend : bool, optional
-        Display legend, default is True.
-    figsize : tuple, optional
-        Figure size as (width, height) in inches, default is (14, 7).
-    dpi : int, optional
-        Dots per inch (resolution) of the figure, default is 150.
-
-    Returns
-    -------
-    matplotlib.axes.Axes
-        Axes containing the ARIMA forecast plot.
-
-    Raises
-    ------
-    ValueError
-        If `days_back` is not sufficient to accommodate the test set and training data.
-        If price data contains non-positive values, as log-difference requires strictly positive data.
-        If an invalid `price_type`, `exog_price_type`, or `smoother` is provided.
-        If `strict_stationarity` is True and the series is not stationary after preprocessing.
-    """
     # Validate input parameters
-    min_obs = 30  # Minimum observations required for ARIMA fitting (from select_best_arimax)
-    if days_back < test_size + min_obs + periods:
+    min_obs = minimum_observations  
+    if days_back < test_size + min_obs + max_differencing_periods:
         raise ValueError(
             f"days_back ({days_back}) must be greater than test_size ({test_size}) + minimum observations ({min_obs}) + periods ({periods}) for ARIMA fitting."
         )
@@ -759,31 +688,22 @@ def ax_arima_forecast(
         symbol, days_back, price_type, calendar_days
     )
 
-    # Fetch exogenous data (e.g., opening prices)
-    _, exog_prices, _, _, _ = _fetch_price_data(
-        symbol, days_back, exog_price_type, calendar_days
-    )
-
     # Create DataFrame for ARIMA preparation
     df = pd.DataFrame({
         price_type: prices,
-        exog_price_type: exog_prices
+        exog_price_type: prices
     }, index=dates)
 
     # Apply smoothing
     if smoother == "lowess":
         smoothed_prices = smooth_lowess(prices, window_length=smoothing_window)
-        smoothed_exog = smooth_lowess(exog_prices, window_length=smoothing_window)
         label_smoother = "LOWESS"
     elif smoother == "exponential":
         smoothed_prices, _ = exponential_smoother(prices, window_length=smoothing_window)
-        smoothed_exog, _ = exponential_smoother(exog_prices, window_length=smoothing_window)
         smoothed_prices = smoothed_prices.values  # Convert to numpy array
-        smoothed_exog = smoothed_exog.values
         label_smoother = "Exponential"
     elif smoother == "sma":
         smoothed_prices = sma_smoother(prices, window_length=smoothing_window)
-        smoothed_exog = sma_smoother(exog_prices, window_length=smoothing_window)
         label_smoother = "Simple Moving Average"
     else:
         raise ValueError("Invalid smoother type.")
@@ -904,3 +824,78 @@ def ax_arima_forecast(
         ax.legend()
 
     return ax
+
+
+
+    """
+    Plot smoothed stock price data with an ARIMA forecast, including a train-test split and prediction intervals.
+
+    This function retrieves historical stock prices, applies smoothing and log-differencing, splits the data into
+    training and test sets, fits an ARIMA model, and forecasts future prices with prediction intervals. The plot
+    shows the training data, test data, and forecasted prices with intervals.
+
+    Parameters
+    ----------
+    symbol : str
+        Stock ticker symbol (e.g., 'AAPL').
+    days_back : int, optional
+        Number of days of historical data to fetch, default is 125.
+    test_size : int, optional
+        Number of days to use for the test set, default is 5.
+    forecast_horizon : int, optional
+        Number of days to forecast into the future, default is 5.
+    smoothing_window : int, optional
+        Window length for smoothing algorithm, default is 40.
+    smoother : {'lowess', 'exponential', 'sma'}, optional
+        Smoothing method to apply to the price data, default is 'lowess'.
+        - 'lowess': Locally Weighted Scatterplot Smoothing.
+        - 'exponential': Exponential smoothing.
+        - 'sma': Simple Moving Average.
+    price_type : {'open', 'close', 'high', 'low'}, optional
+        Type of price data to forecast, default is 'close'.
+    exog_price_type : {'open', 'close', 'high', 'low'}, optional
+        Type of price data to use as the exogenous variable, default is 'open'.
+    periods : int, optional
+        Number of periods for differencing in log-difference calculation, default is 1.
+    ci : float, optional
+        Confidence level for prediction intervals (as a percentage), default is 95.
+    calendar_days : bool, optional
+        If True, uses calendar days, otherwise trading days, default is False.
+    level_shifts_model : {'l2', 'l1', 'rbf', 'linear', 'normal', None}, optional
+        Ruptures model for detecting level shifts in the smoothed series, default is None.
+    level_shifts_penalty : float, optional
+        Penalty for level shift detection, default is 5.
+    level_shifts_min_size : int, optional
+        Minimum points between detected shifts, default is 10.
+    strict_stationarity : bool, optional
+        If True, enforces strict stationarity (both ADF and KPSS must pass); if False, proceeds with a warning if the series is not stationary, default is True.
+    ax : matplotlib.axes.Axes, optional
+        Existing axes to plot on. If None, a new figure and axes are created.
+    show_title : bool, optional
+        Show the plot title, default is True.
+    show_x_label : bool, optional
+        Show the x-axis label ('Date'), default is True.
+    show_y_label : bool, optional
+        Show the y-axis label ('Price (USD)'), default is True.
+    show_grid : bool, optional
+        Show grid lines, default is True.
+    show_legend : bool, optional
+        Display legend, default is True.
+    figsize : tuple, optional
+        Figure size as (width, height) in inches, default is (14, 7).
+    dpi : int, optional
+        Dots per inch (resolution) of the figure, default is 150.
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+        Axes containing the ARIMA forecast plot.
+
+    Raises
+    ------
+    ValueError
+        If `days_back` is not sufficient to accommodate the test set and training data.
+        If price data contains non-positive values, as log-difference requires strictly positive data.
+        If an invalid `price_type`, `exog_price_type`, or `smoother` is provided.
+        If `strict_stationarity` is True and the series is not stationary after preprocessing.
+    """
