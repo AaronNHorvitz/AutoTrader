@@ -34,7 +34,8 @@ from .visualizations import (
     plot_stock_trends_with_intervals,
     ax_smoothed_prices,
     ax_residuals,
-    ax_log_difference
+    ax_log_difference,
+    ax_arima_forecast
 )
 
 from src.config import (
@@ -70,5 +71,6 @@ __all__ = [
     'fetch_price_range',
     'ax_smoothed_prices',
     'ax_residuals',
-    'ax_log_difference'
+    'ax_log_difference',
+    'ax_arima_forecast'
 ]

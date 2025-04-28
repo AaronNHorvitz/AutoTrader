@@ -13,6 +13,7 @@ from .exploratory_plots import (
     ax_smoothed_prices,
     ax_residuals, 
     ax_log_difference, 
+    ax_arima_forecast,
 
 )
 
@@ -20,5 +21,6 @@ __all__ = [
     'plot_stock_trends_with_intervals',
     'ax_smoothed_prices',
     'ax_residuals',
-    'x_log_difference'
+    'x_log_difference',
+    'ax_arima_forecast'
     ]

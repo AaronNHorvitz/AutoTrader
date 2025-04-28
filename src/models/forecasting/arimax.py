@@ -42,7 +42,7 @@ def select_best_arimax(endog: pd.Series, exog: pd.Series, min_obs: int = 30):
     best_model = None
 
     for p in range(3):
-        for d in range(2):
+        for d in range(3):  # Increased range to 0-2
             for q in range(3):
                 try:
                     model = SARIMAX(endog, exog=exog, order=(p, d, q))
@@ -106,7 +106,6 @@ def forecast_arimax(
 
     return forecast_df
 
-
 def prepare_data_and_fit_arimax(
     df, price_col, exog_col, smoothing_window=30, signif=0.05
 ):
@@ -130,8 +129,12 @@ def prepare_data_and_fit_arimax(
     -------
     tuple
         Fitted ARIMAX model, ARIMA order, and smoothed log-differenced series.
-    """
 
+    Raises:
+    ------
+    ValueError
+        If the series is not stationary after preprocessing, with details on test results.
+    """
     # Apply LOWESS smoothing
     price_smoothed = smooth_lowess(df[price_col], window_length=smoothing_window)
     exog_smoothed = smooth_lowess(df[exog_col], window_length=smoothing_window)
@@ -142,15 +145,19 @@ def prepare_data_and_fit_arimax(
 
     # Check stationarity
     stationarity_results = check_stationarity(price_logdiff, signif)
-    price_stationary = (
-        stationarity_results["conclusion"]["ADF_stationary"]
-        and stationarity_results["conclusion"]["KPSS_stationary"]
-    )
+    adf_stationary = stationarity_results["conclusion"]["ADF_stationary"]
+    kpss_stationary = stationarity_results["conclusion"]["KPSS_stationary"]
+    adf_pvalue = stationarity_results["ADF"]["p_value"]
+    kpss_pvalue = stationarity_results["KPSS"]["p_value"]
 
-    if not price_stationary:
-        raise ValueError(
-            f"{price_col} series not stationary after smoothing and log-differencing."
+    if not (adf_stationary and kpss_stationary):
+        error_msg = (
+            f"{price_col} series not stationary after smoothing and log-differencing.\n"
+            f"ADF Test (p-value: {adf_pvalue:.4f}, stationary: {adf_stationary})\n"
+            f"KPSS Test (p-value: {kpss_pvalue:.4f}, stationary: {kpss_stationary})\n"
+            f"Try increasing smoothing_window or applying additional differencing."
         )
+        raise ValueError(error_msg)
 
     # Fit ARIMAX model
     model, order = select_best_arimax(price_logdiff, exog_logdiff)
