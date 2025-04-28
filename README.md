@@ -199,15 +199,21 @@ Type in this and hit enter:
 ```
 cd stat_656_autotrader
 ```
-
+I'm in linux and I'm trying to run a script to intsall Mamba. My instructions are: 
 ##### - 2. Run the Setup Script:
 This script:
 - Installs Mamba if not already present.
 - Removes any existing autotrader environment.
 - Creates a fresh autotrader environment using environment.yaml.
 
+**Windows**
 ```
 .\setup_env.ps1
+```
+
+**Linux and MaxOS**
+```
+bash setup_env.sh
 ```
 
 ##### - 3. Activate the Environment:
