@@ -10,6 +10,73 @@ from src.utils.db_utils import fetch_price_range
 
 warnings.filterwarnings("ignore")
 
+def prepare_endog_data(df, price_cols smoothing_window=30):
+
+
+
+
+def fit_arimax(
+    df, price_col, exog_col, smoothing_window=30, signif=0.05)
+
+
+def prepare_data_and_fit_arimax(
+    df, price_col, exog_col, smoothing_window=30, signif=0.05
+):
+    """
+    Prepare data, apply LOWESS smoothing, check stationarity, and fit ARIMAX model.
+
+    Parameters:
+    ----------
+    df : pd.DataFrame
+        DataFrame containing price and exogenous columns.
+    price_col : str
+        Target price column to forecast (e.g., 'close', 'high', 'low').
+    exog_col : str
+        Exogenous price column (usually 'open').
+    smoothing_window : int, optional
+        Window length for LOWESS smoothing, default is 30.
+    signif : float, optional
+        Significance level for stationarity tests, default is 0.05.
+
+    Returns:
+    -------
+    tuple
+        Fitted ARIMAX model, ARIMA order, and smoothed log-differenced series.
+
+    Raises:
+    ------
+    ValueError
+        If the series is not stationary after preprocessing, with details on test results.
+    """
+    # Apply LOWESS smoothing
+    price_smoothed = smooth_lowess(df[price_col], window_length=smoothing_window)
+    exog_smoothed = smooth_lowess(df[exog_col], window_length=smoothing_window)
+
+    # Log-difference the smoothed data
+    price_logdiff = log_difference(pd.Series(price_smoothed))
+    exog_logdiff = log_difference(pd.Series(exog_smoothed))
+
+    # Check stationarity
+    stationarity_results = check_stationarity(price_logdiff, signif)
+    adf_stationary = stationarity_results["conclusion"]["ADF_stationary"]
+    kpss_stationary = stationarity_results["conclusion"]["KPSS_stationary"]
+    adf_pvalue = stationarity_results["ADF"]["p_value"]
+    kpss_pvalue = stationarity_results["KPSS"]["p_value"]
+
+    if not (adf_stationary and kpss_stationary):
+        error_msg = (
+            f"{price_col} series not stationary after smoothing and log-differencing.\n"
+            f"ADF Test (p-value: {adf_pvalue:.4f}, stationary: {adf_stationary})\n"
+            f"KPSS Test (p-value: {kpss_pvalue:.4f}, stationary: {kpss_stationary})\n"
+            f"Try increasing smoothing_window or applying additional differencing."
+        )
+        raise ValueError(error_msg)
+
+    # Fit ARIMAX model
+    model, order = select_best_arimax(price_logdiff, exog_logdiff)
+
+    return model, order, price_logdiff, exog_logdiff
+
 
 def select_best_arimax(endog: pd.Series, exog: pd.Series, min_obs: int = 30):
     """
@@ -106,63 +173,7 @@ def forecast_arimax(
 
     return forecast_df
 
-def prepare_data_and_fit_arimax(
-    df, price_col, exog_col, smoothing_window=30, signif=0.05
-):
-    """
-    Prepare data, apply LOWESS smoothing, check stationarity, and fit ARIMAX model.
 
-    Parameters:
-    ----------
-    df : pd.DataFrame
-        DataFrame containing price and exogenous columns.
-    price_col : str
-        Target price column to forecast (e.g., 'close', 'high', 'low').
-    exog_col : str
-        Exogenous price column (usually 'open').
-    smoothing_window : int, optional
-        Window length for LOWESS smoothing, default is 30.
-    signif : float, optional
-        Significance level for stationarity tests, default is 0.05.
-
-    Returns:
-    -------
-    tuple
-        Fitted ARIMAX model, ARIMA order, and smoothed log-differenced series.
-
-    Raises:
-    ------
-    ValueError
-        If the series is not stationary after preprocessing, with details on test results.
-    """
-    # Apply LOWESS smoothing
-    price_smoothed = smooth_lowess(df[price_col], window_length=smoothing_window)
-    exog_smoothed = smooth_lowess(df[exog_col], window_length=smoothing_window)
-
-    # Log-difference the smoothed data
-    price_logdiff = log_difference(pd.Series(price_smoothed))
-    exog_logdiff = log_difference(pd.Series(exog_smoothed))
-
-    # Check stationarity
-    stationarity_results = check_stationarity(price_logdiff, signif)
-    adf_stationary = stationarity_results["conclusion"]["ADF_stationary"]
-    kpss_stationary = stationarity_results["conclusion"]["KPSS_stationary"]
-    adf_pvalue = stationarity_results["ADF"]["p_value"]
-    kpss_pvalue = stationarity_results["KPSS"]["p_value"]
-
-    if not (adf_stationary and kpss_stationary):
-        error_msg = (
-            f"{price_col} series not stationary after smoothing and log-differencing.\n"
-            f"ADF Test (p-value: {adf_pvalue:.4f}, stationary: {adf_stationary})\n"
-            f"KPSS Test (p-value: {kpss_pvalue:.4f}, stationary: {kpss_stationary})\n"
-            f"Try increasing smoothing_window or applying additional differencing."
-        )
-        raise ValueError(error_msg)
-
-    # Fit ARIMAX model
-    model, order = select_best_arimax(price_logdiff, exog_logdiff)
-
-    return model, order, price_logdiff, exog_logdiff
 
 
 def prepare_and_validate_data(ticker: str, days_back: int = 150):
