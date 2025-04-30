@@ -213,7 +213,7 @@ This script:
 
 **Linux and MaxOS**
 ```
-bash setup_env.sh
+bash setup_env.ps1
 ```
 
 ##### - 3. Activate the Environment:
