@@ -258,7 +258,8 @@ Before you can download tickers, you need an Alpaca account and API keys. Alpaca
 - **Action**: Click “Get Started” (top right) or “Sign Up” (center).
 - **Details**: Enter your email and create a password.
 
-#### - B. Switch to Paper Trading
+#### - B. Switch to Paper Trading 
+#### (WARNING: This step may not work for you. If it doesn't you may need to use a credit/ debit card.)
 - **Log In**: Head to [app.alpaca.markets](https://app.alpaca.markets/).
 - **Toggle**: Top left corner—switch from “Live” to “Paper”.
 - Paper trading gives you API access without funding.
