@@ -211,9 +211,29 @@ This script:
 .\setup_env.ps1
 ```
 
-**Linux and MaxOS**
+**Updated Environment Setup Instructions for Mac/Linux Users**
+- Step 1: Before running the setup script on Mac or Linux, you need to set execute permissions for the script. Open your terminal and run:
 ```
-bash setup_env.ps1
+chmod +x setup_env.ps1
+```
+
+- Step 2: Run the Setup Script
+
+Execute the script using PowerShell. On Mac and Linux systems, install PowerShell first if you don't have it already:
+- *MacOS*
+```
+brew install powershell
+```
+
+- *Linux (Ubuntu/Debian):*
+```
+sudo apt-get update
+sudo apt-get install -y powershell
+```
+- Then, run the setup script using PowerShell:
+
+```
+pwsh setup_env.ps1
 ```
 
 ##### - 3. Activate the Environment:
