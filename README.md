@@ -1,6 +1,6 @@
-# STAT 656 Autotrader
+# Autotrader - In Development
 
-Welcome to the STAT 656 Autotrader by the Data Science Daytraders. This project fetches stock tickers and historical data from Alpaca, storing them in a structured SQLite database. It leverages **ARIMAX forecasting**, and **Bayesian (MCMC) methods** for systematic stock selection, portfolio optimization, and automated daily trading.
+Welcome to the AutoTrader. This project fetches stock tickers and historical data from Alpaca, storing them in a structured SQLite database. It leverages **ARIMAX forecasting**, and **Bayesian (MCMC) methods** for systematic stock selection, portfolio optimization, and automated daily trading.
 
 ---
 
