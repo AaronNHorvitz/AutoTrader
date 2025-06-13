@@ -113,7 +113,7 @@ $Buy Limit = \frac{Forecasted Low + Forecasted Close }{2}$
 $Stop Loss = Forecasted Low - (Forecasted Close - Forecasted Low) x 0.5$
 
 ### Sell Limit
-$Suy Limit = \frac{Forecasted High + Forecasted Close }{2}$
+$Sell Limit = \frac{Forecasted High + Forecasted Close }{2}$
 
 ### Stock Purchase Example:
 The MCMC model identifies a stock for purchase. The forecasted low is $150, and the forecasted close is $155. 
